@@ -1,0 +1,37 @@
+Creating contract KT1TezoooozzSmartPyzzSTATiCzzzwwBFA1
+ -> (Pair {} (Pair {} {}))
+file OppNet_Test/step_001_cont_0_storage.tz
+file OppNet_Test/step_001_cont_0_storage.json
+file OppNet_Test/step_001_cont_0_storage.py
+file OppNet_Test/step_001_cont_0_types.py
+file OppNet_Test/step_001_cont_0_contract.tz contract NetworkInfoContract
+file OppNet_Test/step_001_cont_0_contract.json contract NetworkInfoContract
+Comment...
+ h1: NetworkInfoContract
+Comment...
+ h2: Store Network Info
+file OppNet_Test/step_004_cont_0_params.py
+file OppNet_Test/step_004_cont_0_params.tz
+file OppNet_Test/step_004_cont_0_params.json
+Executing store_network_info(sp.record(network_info = {'channel' : '1', 'freq' : '2.4', 'ip' : '10.0.0.2/8', 'mac' : '00:00:00:00:00:02', 'mode' : 'g', 'position' : '24.67, 68.67, 0.0'}, station_name = 'sta1', timestamp = '2024-02-22 17:46:06'))...
+ -> (Pair {} (Pair {Elt "sta1" {Elt "network_info" {Elt "channel" "1"; Elt "freq" "2.4"; Elt "ip" "10.0.0.2/8"; Elt "mac" "00:00:00:00:00:02"; Elt "mode" "g"; Elt "position" "24.67, 68.67, 0.0"}}} {Elt "2024-02-22 17:46:06" {Elt "sta1" {Elt "network_info" {Elt "channel" "1"; Elt "freq" "2.4"; Elt "ip" "10.0.0.2/8"; Elt "mac" "00:00:00:00:00:02"; Elt "mode" "g"; Elt "position" "24.67, 68.67, 0.0"}}}}))
+file OppNet_Test/step_005_cont_0_params.py
+file OppNet_Test/step_005_cont_0_params.tz
+file OppNet_Test/step_005_cont_0_params.json
+Executing store_network_info(sp.record(network_info = {'channel' : '1', 'freq' : '2.4', 'ip' : '10.0.0.3/8', 'mac' : '00:00:00:00:00:03', 'mode' : 'g', 'position' : '62.08, 16.17, 0.0'}, station_name = 'sta2', timestamp = '2024-02-22 17:46:06'))...
+ -> (Pair {} (Pair {Elt "sta1" {Elt "network_info" {Elt "channel" "1"; Elt "freq" "2.4"; Elt "ip" "10.0.0.2/8"; Elt "mac" "00:00:00:00:00:02"; Elt "mode" "g"; Elt "position" "24.67, 68.67, 0.0"}}} {Elt "2024-02-22 17:46:06" {Elt "sta1" {Elt "network_info" {Elt "channel" "1"; Elt "freq" "2.4"; Elt "ip" "10.0.0.2/8"; Elt "mac" "00:00:00:00:00:02"; Elt "mode" "g"; Elt "position" "24.67, 68.67, 0.0"}}; Elt "sta2" {Elt "network_info" {Elt "channel" "1"; Elt "freq" "2.4"; Elt "ip" "10.0.0.3/8"; Elt "mac" "00:00:00:00:00:03"; Elt "mode" "g"; Elt "position" "62.08, 16.17, 0.0"}}}}))
+file OppNet_Test/step_006_cont_0_params.py
+file OppNet_Test/step_006_cont_0_params.tz
+file OppNet_Test/step_006_cont_0_params.json
+Executing store_network_info(sp.record(network_info = {'channel' : '1', 'freq' : '2.4', 'ip' : '10.0.0.3/8', 'mac' : '00:00:00:00:00:03', 'mode' : 'g', 'position' : '62.08, 16.17, 0.0'}, station_name = 'sta2', timestamp = '2024-02-22 17:46:06'))...
+ -> (Pair {} (Pair {Elt "sta1" {Elt "network_info" {Elt "channel" "1"; Elt "freq" "2.4"; Elt "ip" "10.0.0.2/8"; Elt "mac" "00:00:00:00:00:02"; Elt "mode" "g"; Elt "position" "24.67, 68.67, 0.0"}}} {Elt "2024-02-22 17:46:06" {Elt "sta1" {Elt "network_info" {Elt "channel" "1"; Elt "freq" "2.4"; Elt "ip" "10.0.0.2/8"; Elt "mac" "00:00:00:00:00:02"; Elt "mode" "g"; Elt "position" "24.67, 68.67, 0.0"}}; Elt "sta2" {Elt "network_info" {Elt "channel" "1"; Elt "freq" "2.4"; Elt "ip" "10.0.0.3/8"; Elt "mac" "00:00:00:00:00:03"; Elt "mode" "g"; Elt "position" "62.08, 16.17, 0.0"}}}}))
+file OppNet_Test/step_007_cont_0_params.py
+file OppNet_Test/step_007_cont_0_params.tz
+file OppNet_Test/step_007_cont_0_params.json
+Executing store_network_info(sp.record(network_info = {'channel' : '1', 'freq' : '2.4', 'ip' : '10.0.0.4/8', 'mac' : '00:00:00:00:00:04', 'mode' : 'g', 'position' : '39.28, 53.06, 0.0'}, station_name = 'sta3', timestamp = '2024-02-22 17:46:06'))...
+ -> (Pair {} (Pair {Elt "sta1" {Elt "network_info" {Elt "channel" "1"; Elt "freq" "2.4"; Elt "ip" "10.0.0.2/8"; Elt "mac" "00:00:00:00:00:02"; Elt "mode" "g"; Elt "position" "24.67, 68.67, 0.0"}}} {Elt "2024-02-22 17:46:06" {Elt "sta1" {Elt "network_info" {Elt "channel" "1"; Elt "freq" "2.4"; Elt "ip" "10.0.0.2/8"; Elt "mac" "00:00:00:00:00:02"; Elt "mode" "g"; Elt "position" "24.67, 68.67, 0.0"}}; Elt "sta2" {Elt "network_info" {Elt "channel" "1"; Elt "freq" "2.4"; Elt "ip" "10.0.0.3/8"; Elt "mac" "00:00:00:00:00:03"; Elt "mode" "g"; Elt "position" "62.08, 16.17, 0.0"}}; Elt "sta3" {Elt "network_info" {Elt "channel" "1"; Elt "freq" "2.4"; Elt "ip" "10.0.0.4/8"; Elt "mac" "00:00:00:00:00:04"; Elt "mode" "g"; Elt "position" "39.28, 53.06, 0.0"}}}}))
+file OppNet_Test/step_008_cont_0_params.py
+file OppNet_Test/step_008_cont_0_params.tz
+file OppNet_Test/step_008_cont_0_params.json
+Executing store_distances_info(sp.record(distance = '64.47 meters', staX = 'sta1', staY = 'sta2'))...
+ -> (Pair {Elt (Pair "sta1" "sta2") "64.47 meters"} (Pair {Elt "sta1" {Elt "network_info" {Elt "channel" "1"; Elt "freq" "2.4"; Elt "ip" "10.0.0.2/8"; Elt "mac" "00:00:00:00:00:02"; Elt "mode" "g"; Elt "position" "24.67, 68.67, 0.0"}}} {Elt "2024-02-22 17:46:06" {Elt "sta1" {Elt "network_info" {Elt "channel" "1"; Elt "freq" "2.4"; Elt "ip" "10.0.0.2/8"; Elt "mac" "00:00:00:00:00:02"; Elt "mode" "g"; Elt "position" "24.67, 68.67, 0.0"}}; Elt "sta2" {Elt "network_info" {Elt "channel" "1"; Elt "freq" "2.4"; Elt "ip" "10.0.0.3/8"; Elt "mac" "00:00:00:00:00:03"; Elt "mode" "g"; Elt "position" "62.08, 16.17, 0.0"}}; Elt "sta3" {Elt "network_info" {Elt "channel" "1"; Elt "freq" "2.4"; Elt "ip" "10.0.0.4/8"; Elt "mac" "00:00:00:00:00:04"; Elt "mode" "g"; Elt "position" "39.28, 53.06, 0.0"}}}}))

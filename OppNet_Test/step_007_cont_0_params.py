@@ -1,0 +1,1 @@
+sp.record(network_info = {'channel' : '1', 'freq' : '2.4', 'ip' : '10.0.0.4/8', 'mac' : '00:00:00:00:00:04', 'mode' : 'g', 'position' : '39.28, 53.06, 0.0'}, station_name = 'sta3', timestamp = '2024-02-22 17:46:06')

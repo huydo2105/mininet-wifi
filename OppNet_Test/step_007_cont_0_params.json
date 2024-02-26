@@ -1,0 +1,14 @@
+{
+  "prim": "Pair",
+  "args": [
+    [
+      { "prim": "Elt", "args": [ { "string": "channel" }, { "string": "1" } ] },
+      { "prim": "Elt", "args": [ { "string": "freq" }, { "string": "2.4" } ] },
+      { "prim": "Elt", "args": [ { "string": "ip" }, { "string": "10.0.0.4/8" } ] },
+      { "prim": "Elt", "args": [ { "string": "mac" }, { "string": "00:00:00:00:00:04" } ] },
+      { "prim": "Elt", "args": [ { "string": "mode" }, { "string": "g" } ] },
+      { "prim": "Elt", "args": [ { "string": "position" }, { "string": "39.28, 53.06, 0.0" } ] }
+    ],
+    { "prim": "Pair", "args": [ { "string": "sta3" }, { "string": "2024-02-22 17:46:06" } ] }
+  ]
+}
