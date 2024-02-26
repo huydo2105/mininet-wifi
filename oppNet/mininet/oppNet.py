@@ -49,7 +49,7 @@ def track_network_information(net, file):
     while True:
         timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
         # Write the information to the file
-        file.write(f"\nTimestamp: {timestamp}\n")
+        file.write(f"Timestamp: {timestamp}\n")
         network_info= ""
         recorded_distances = set()  # Set to store recorded distances
 
@@ -63,7 +63,8 @@ def track_network_information(net, file):
                         distance = calculate_distance(net, sta1, sta2)
                         file.write(f"Distance between {sta1.name} and {sta2.name}: {distance:.2f} meters,")
                         recorded_distances.add(distance_pair)
-
+                        
+        file.write(f"\n")
         file.flush()  # Flush the buffer to ensure data is written immediately
         time.sleep(5)  # Sleep for 5 seconds before the next iteration
 
