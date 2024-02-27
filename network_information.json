@@ -1,0 +1,469 @@
+{
+  "timestamp": "2024-02-27 17:21:03",
+  "stations": {
+    "sta1": {
+      "coordination": [
+        16.65,
+        50.45,
+        0.0
+      ],
+      "parameters": {
+        "ip": "10.0.0.2/8",
+        "ip6": "2001:0:0:0:0:0:0:1/64",
+        "channel": 1,
+        "freq": 2.4,
+        "mode": "g",
+        "encrypt": "",
+        "passwd": null,
+        "ieee80211w": null,
+        "mac": "00:00:00:00:00:02",
+        "min_x": 10,
+        "max_x": 30,
+        "min_y": 50,
+        "max_y": 70,
+        "min_v": 5,
+        "max_v": 10,
+        "wlan": [
+          "sta1-wlan0"
+        ]
+      },
+      "frequency": 2.432,
+      "mode": "g",
+      "tx_power": 15,
+      "range": 48.436924929420485,
+      "antenna_gain": 5
+    },
+    "sta2": {
+      "coordination": [
+        61.89,
+        13.36,
+        0.0
+      ],
+      "parameters": {
+        "ip": "10.0.0.3/8",
+        "ip6": "2001:0:0:0:0:0:0:2/64",
+        "channel": 1,
+        "freq": 2.4,
+        "mode": "g",
+        "encrypt": "",
+        "passwd": null,
+        "ieee80211w": null,
+        "min_x": 60,
+        "max_x": 70,
+        "min_y": 10,
+        "max_y": 20,
+        "min_v": 1,
+        "max_v": 5,
+        "wlan": [
+          "sta2-wlan0"
+        ]
+      },
+      "frequency": 2.432,
+      "mode": "g",
+      "tx_power": 15,
+      "range": 48.436924929420485,
+      "antenna_gain": 5
+    },
+    "sta3": {
+      "coordination": [
+        34.56,
+        33.97,
+        0.0
+      ],
+      "parameters": {
+        "ip": "10.0.0.4/8",
+        "ip6": "2001:0:0:0:0:0:0:3/64",
+        "channel": 1,
+        "freq": 2.4,
+        "mode": "g",
+        "encrypt": "",
+        "passwd": null,
+        "ieee80211w": null,
+        "min_x": 30,
+        "max_x": 40,
+        "min_y": 5,
+        "max_y": 80,
+        "min_v": 3,
+        "max_v": 8,
+        "wlan": [
+          "sta3-wlan0"
+        ]
+      },
+      "frequency": 2.432,
+      "mode": "g",
+      "tx_power": 15,
+      "range": 48.436924929420485,
+      "antenna_gain": 5
+    },
+    "sta4": {
+      "coordination": [
+        18.49,
+        117.3,
+        0.0
+      ],
+      "parameters": {
+        "ip": "10.0.0.5/8",
+        "ip6": "2001:0:0:0:0:0:0:4/64",
+        "channel": 1,
+        "freq": 2.4,
+        "mode": "g",
+        "encrypt": "",
+        "passwd": null,
+        "ieee80211w": null,
+        "mac": "00:00:00:00:00:05",
+        "min_x": 10,
+        "max_x": 60,
+        "min_y": 100,
+        "max_y": 140,
+        "min_v": 5,
+        "max_v": 10,
+        "wlan": [
+          "sta4-wlan0"
+        ]
+      },
+      "frequency": 2.432,
+      "mode": "g",
+      "tx_power": 15,
+      "range": 48.436924929420485,
+      "antenna_gain": 5
+    },
+    "sta5": {
+      "coordination": [
+        121.71,
+        37.64,
+        0.0
+      ],
+      "parameters": {
+        "ip": "10.0.0.6/8",
+        "ip6": "2001:0:0:0:0:0:0:5/64",
+        "channel": 1,
+        "freq": 2.4,
+        "mode": "g",
+        "encrypt": "",
+        "passwd": null,
+        "ieee80211w": null,
+        "min_x": 120,
+        "max_x": 140,
+        "min_y": 20,
+        "max_y": 40,
+        "min_v": 1,
+        "max_v": 5,
+        "wlan": [
+          "sta5-wlan0"
+        ]
+      },
+      "frequency": 2.432,
+      "mode": "g",
+      "tx_power": 15,
+      "range": 48.436924929420485,
+      "antenna_gain": 5
+    },
+    "sta6": {
+      "coordination": [
+        70.75,
+        14.55,
+        0.0
+      ],
+      "parameters": {
+        "ip": "10.0.0.7/8",
+        "ip6": "2001:0:0:0:0:0:0:6/64",
+        "channel": 1,
+        "freq": 2.4,
+        "mode": "g",
+        "encrypt": "",
+        "passwd": null,
+        "ieee80211w": null,
+        "min_x": 60,
+        "max_x": 80,
+        "min_y": 10,
+        "max_y": 160,
+        "min_v": 3,
+        "max_v": 8,
+        "wlan": [
+          "sta6-wlan0"
+        ]
+      },
+      "frequency": 2.432,
+      "mode": "g",
+      "tx_power": 15,
+      "range": 48.436924929420485,
+      "antenna_gain": 5
+    },
+    "sta7": {
+      "coordination": [
+        47.69,
+        199.17,
+        0.0
+      ],
+      "parameters": {
+        "ip": "10.0.0.8/8",
+        "ip6": "2001:0:0:0:0:0:0:7/64",
+        "channel": 1,
+        "freq": 2.4,
+        "mode": "g",
+        "encrypt": "",
+        "passwd": null,
+        "ieee80211w": null,
+        "mac": "00:00:00:00:00:08",
+        "min_x": 30,
+        "max_x": 90,
+        "min_y": 150,
+        "max_y": 210,
+        "min_v": 5,
+        "max_v": 10,
+        "wlan": [
+          "sta7-wlan0"
+        ]
+      },
+      "frequency": 2.432,
+      "mode": "g",
+      "tx_power": 15,
+      "range": 48.436924929420485,
+      "antenna_gain": 5
+    },
+    "sta8": {
+      "coordination": [
+        181.34,
+        40.26,
+        0.0
+      ],
+      "parameters": {
+        "ip": "10.0.0.9/8",
+        "ip6": "2001:0:0:0:0:0:0:8/64",
+        "channel": 1,
+        "freq": 2.4,
+        "mode": "g",
+        "encrypt": "",
+        "passwd": null,
+        "ieee80211w": null,
+        "min_x": 180,
+        "max_x": 210,
+        "min_y": 30,
+        "max_y": 60,
+        "min_v": 1,
+        "max_v": 5,
+        "wlan": [
+          "sta8-wlan0"
+        ]
+      },
+      "frequency": 2.432,
+      "mode": "g",
+      "tx_power": 15,
+      "range": 48.436924929420485,
+      "antenna_gain": 5
+    },
+    "sta9": {
+      "coordination": [
+        -65955.58,
+        169.64,
+        0.0
+      ],
+      "parameters": {
+        "ip": "10.0.0.10/8",
+        "ip6": "2001:0:0:0:0:0:0:9/64",
+        "channel": 1,
+        "freq": 2.4,
+        "mode": "g",
+        "encrypt": "",
+        "passwd": null,
+        "ieee80211w": null,
+        "min_x": 90,
+        "max_x": 60,
+        "min_y": 15,
+        "max_y": 240,
+        "min_v": 3,
+        "max_v": 8,
+        "wlan": [
+          "sta9-wlan0"
+        ]
+      },
+      "frequency": 2.432,
+      "mode": "g",
+      "tx_power": 15,
+      "range": 48.436924929420485,
+      "antenna_gain": 5
+    }
+  },
+  "distances": [
+    {
+      "staX": "sta1",
+      "staY": "sta2",
+      "distance": 58.5006470049691
+    },
+    {
+      "staX": "sta1",
+      "staY": "sta3",
+      "distance": 24.338416135812952
+    },
+    {
+      "staX": "sta1",
+      "staY": "sta4",
+      "distance": 66.87531756933943
+    },
+    {
+      "staX": "sta1",
+      "staY": "sta5",
+      "distance": 105.83808246562293
+    },
+    {
+      "staX": "sta1",
+      "staY": "sta6",
+      "distance": 64.92780606180992
+    },
+    {
+      "staX": "sta1",
+      "staY": "sta7",
+      "distance": 151.92471819950825
+    },
+    {
+      "staX": "sta1",
+      "staY": "sta8",
+      "distance": 165.00494598647643
+    },
+    {
+      "staX": "sta1",
+      "staY": "sta9",
+      "distance": 65972.33766836673
+    },
+    {
+      "staX": "sta2",
+      "staY": "sta3",
+      "distance": 34.23011831706107
+    },
+    {
+      "staX": "sta2",
+      "staY": "sta4",
+      "distance": 112.63695485940659
+    },
+    {
+      "staX": "sta2",
+      "staY": "sta5",
+      "distance": 64.55966852455177
+    },
+    {
+      "staX": "sta2",
+      "staY": "sta6",
+      "distance": 8.939558154629344
+    },
+    {
+      "staX": "sta2",
+      "staY": "sta7",
+      "distance": 186.35180734299306
+    },
+    {
+      "staX": "sta2",
+      "staY": "sta8",
+      "distance": 122.44146560704017
+    },
+    {
+      "staX": "sta2",
+      "staY": "sta9",
+      "distance": 66017.65497682647
+    },
+    {
+      "staX": "sta3",
+      "staY": "sta4",
+      "distance": 84.86538634802766
+    },
+    {
+      "staX": "sta3",
+      "staY": "sta5",
+      "distance": 87.22724001136342
+    },
+    {
+      "staX": "sta3",
+      "staY": "sta6",
+      "distance": 41.07130993771686
+    },
+    {
+      "staX": "sta3",
+      "staY": "sta7",
+      "distance": 165.7209609554567
+    },
+    {
+      "staX": "sta3",
+      "staY": "sta8",
+      "distance": 146.91471165271366
+    },
+    {
+      "staX": "sta3",
+      "staY": "sta9",
+      "distance": 65990.27946272466
+    },
+    {
+      "staX": "sta4",
+      "staY": "sta5",
+      "distance": 130.38437022895036
+    },
+    {
+      "staX": "sta4",
+      "staY": "sta6",
+      "distance": 115.27649413475412
+    },
+    {
+      "staX": "sta4",
+      "staY": "sta7",
+      "distance": 86.92144096826742
+    },
+    {
+      "staX": "sta4",
+      "staY": "sta8",
+      "distance": 180.15350149247723
+    },
+    {
+      "staX": "sta4",
+      "staY": "sta9",
+      "distance": 65974.09076175663
+    },
+    {
+      "staX": "sta5",
+      "staY": "sta6",
+      "distance": 55.94702583694686
+    },
+    {
+      "staX": "sta5",
+      "staY": "sta7",
+      "distance": 177.68202300739372
+    },
+    {
+      "staX": "sta5",
+      "staY": "sta8",
+      "distance": 59.68753052355242
+    },
+    {
+      "staX": "sta5",
+      "staY": "sta9",
+      "distance": 66077.42184546929
+    },
+    {
+      "staX": "sta6",
+      "staY": "sta7",
+      "distance": 186.0545833888539
+    },
+    {
+      "staX": "sta6",
+      "staY": "sta8",
+      "distance": 113.53920996730601
+    },
+    {
+      "staX": "sta6",
+      "staY": "sta9",
+      "distance": 66026.51214608416
+    },
+    {
+      "staX": "sta7",
+      "staY": "sta8",
+      "distance": 207.64082113110612
+    },
+    {
+      "staX": "sta7",
+      "staY": "sta9",
+      "distance": 66003.27660589133
+    },
+    {
+      "staX": "sta8",
+      "staY": "sta9",
+      "distance": 66137.04654934932
+    }
+  ]
+}

@@ -1,47 +1,80 @@
+import os
+import time
+import json
 from pytezos import pytezos
+from threading import Thread
 
-# Replace the following with your actual parameters
-CONTRACT_CODE_PATH = "path/to/your/contract.py"
-CONTRACT_ADDRESS = "KT1YourContractAddress"
-CONTRACT_STORAGE = {"timestamps": {}, "latest_info": {}}
+CONTRACT_CODE_PATH = "../contract/main.py"
+CONTRACT_ADDRESS = "KT1GJsDGs1WnSCPMaErYJ8mqHSwwZoJtVMXk"
+CONTRACT_STORAGE = {"timestamps": {}, "latest_info": {}, "distances": {}}
+NODE_URL = "https://ghostnet.ecadinfra.com"
 
-# Deploy the contract
-py = pytezos.using(key="your_key_alias")
-contract = py.contract(origination_block_hash="head").originate(
-    storage=CONTRACT_STORAGE,
-    code=open(CONTRACT_CODE_PATH, "r").read(),
-    public_key="your_public_key"
-).autofill().sign().inject()
+def read_network_information(file_path):
+    with open(file_path, "r") as json_file:
+        return json.load(json_file)
 
-# Store network information
-timestamp = "2024-02-22 17:46:06"
-station_name = "sta1"
-position = [24.67, 68.67, 0.0]
-network_info = {
-    "ip": "10.0.0.2/8",
-    "channel": 1,
-    "freq": 2.4,
-    "mode": "g",
-    "encrypt": "",
-    "passwd": None,
-    "mac": "00:00:00:00:00:02",
-}
+def update_contract(network_info, contract):
+    global CONTRACT_STORAGE
 
-# Call store_network_info entry point
-contract.call(
-    entry_point="store_network_info",
-    params={
-        "timestamp": timestamp,
-        "station_name": station_name,
-        "position": position,
-        "network_info": network_info,
-    },
-).autofill().sign().inject()
+    timestamp = network_info.get("timestamp")
+    stations = network_info.get("stations", {})
+    distances = network_info.get("distances", {})
 
-# Get network information
-result = contract.storage[timestamp][station_name]
-print("Network Information:", result)
+    for station_name, station_info in stations.items():
+        # Call store_network_info for each station
+        contract.store_network_info(
+            timestamp=timestamp,
+            station_name=station_name,
+            network_info={
+                "position": ",".join(map(str, station_info["coordination"])),
+                'ip': station_info["parameters"].get('ip', ''),
+                'channel': station_info["parameters"].get('channel', ''),
+                'freq': station_info["frequency"],
+                'mode': station_info["mode"],
+                'mac': station_info["parameters"].get('mac', '')
+            }
+        )
 
-# Get latest network information
-latest_result = contract.storage["latest_info"][station_name]
-print("Latest Network Information:", latest_result)
+    for distance_info in distances:
+        # Call store_distances_info for each pair of stations
+        contract.store_distances_info(
+            staX=distance_info["staX"],
+            staY=distance_info["staY"],
+            distance=distance_info["distance"]
+        )
+
+def listen_for_changes(file_path, contract):
+    last_updated_time = 0
+
+    while True:
+        try:
+            # Read the content of the JSON file
+            network_info = read_network_information(file_path)
+
+            # Update the contract with the new network information
+            update_contract(network_info, contract)
+
+            # Update the last updated time
+            last_updated_time = os.path.getmtime(file_path)
+
+        except Exception as e:
+            print(f"Error: {e}")
+
+        time.sleep(5)  # Sleep for 5 seconds before checking for changes
+
+def main():
+    # Load the existing contract using the provided CONTRACT_ADDRESS
+    py = pytezos.using(shell=NODE_URL)
+    contract = py.contract(CONTRACT_ADDRESS)
+
+    # Start a thread to listen for changes in the network_information.json file
+    file_path = "network_information.json"
+    update_thread = Thread(target=listen_for_changes, args=(file_path, contract))
+    update_thread.start()
+
+    # Keep the main thread alive
+    while True:
+        time.sleep(1)
+
+if __name__ == "__main__":
+    main()

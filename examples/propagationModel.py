@@ -22,7 +22,7 @@ def topology(args):
     c1 = net.addController('c1')
 
     info("*** Configuring propagation model\n")
-    net.setPropagationModel(model="logDistance", exp=4)
+    net.setPropagationModel(model="friis")
 
     info("*** Configuring nodes\n")
     net.configureNodes()
