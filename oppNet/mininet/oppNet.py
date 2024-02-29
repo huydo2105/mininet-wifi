@@ -10,6 +10,7 @@ import time
 import threading
 import math
 import json
+import os
 from mininet.log import setLogLevel, info
 from mn_wifi.cli import CLI
 from mn_wifi.net import Mininet_wifi
@@ -19,7 +20,7 @@ from mn_wifi.mobility import Mobility
 def track_station_information(station):
     return {
             "coordination": station.position,
-            "parameters": station.params,
+            # "parameters": station.params,
             "frequency": station.wintfs[0].freq,
             "mode": station.wintfs[0].mode,
             "tx_power": station.wintfs[0].txpower,
@@ -42,6 +43,7 @@ def calculate_distance(net, sta1, sta2):
 
 
 def track_network_information(net, file_path):
+    savedElement = 0
     while True:
         timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
         network_info = {"timestamp": timestamp, "stations": {}, "distances": []}
@@ -61,9 +63,13 @@ def track_network_information(net, file_path):
                         recorded_distances.add(distance_pair)
 
         # Write the information to the JSON file
-        with open(file_path, "w") as json_file:
+        with open(file_path, "a+") as json_file:
+            # Check if the file is not empty, then add a comma
+            if json_file.tell() != 0 and savedElement != 0:
+                json_file.write(",")
             json.dump(network_info, json_file, indent=2)
             json_file.flush()  # Flush the buffer to ensure data is written immediately
+            savedElement += 1
 
         time.sleep(5)  # Sleep for 5 seconds before the next iteration
 
@@ -150,6 +156,9 @@ def topology(args):
 
     ## Open file for writing network information
     file_path = "network_information.json"
+    # Opem the file and write "["
+    with open(file_path, "w") as json_file:
+        json_file.write("[")  # Clear the file content
 
     # Start tracking network information in a separate thread
     tracking_thread = threading.Thread(target=track_network_information, args=(net, file_path))
@@ -163,7 +172,7 @@ def topology(args):
 
     # Close the file after the CLI is done
     with open(file_path, "w") as json_file:
-        json_file.write("")  # Clear the file content
+        json_file.write("]")  # Clear the file content
 
     info("*** Stopping network\n")
     net.stop()

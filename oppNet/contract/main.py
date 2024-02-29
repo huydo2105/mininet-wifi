@@ -40,15 +40,11 @@ def main():
                         'network_info': params.network_info
                     }
                 }
-                # Update latest_infor map
-                self.data.latest_infor = sp.update_map(
-                    station_name,
-                    sp.Some(
-                    {
-                        'network_info': params.network_info
-                    }),
-                    self.data.latest_infor
-                )
+            # Update latest_infor map
+            self.data.latest_infor[station_name] = {
+                'network_info': params.network_info
+            }
+            
 
 if "templates" not in __name__:
     @sp.add_test()

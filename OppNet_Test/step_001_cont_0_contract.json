@@ -109,18 +109,19 @@
                     { "prim": "GET" },
                     { "prim": "IF_NONE", "args": [ [ { "prim": "PUSH", "args": [ { "prim": "int" }, { "int": "34" } ] }, { "prim": "FAILWITH" } ], [] ] },
                     { "prim": "EMPTY_MAP", "args": [ { "prim": "string" }, { "prim": "map", "args": [ { "prim": "string" }, { "prim": "string" } ] } ] },
-                    { "prim": "DIG", "args": [ { "int": "6" } ] },
+                    { "prim": "DUP", "args": [ { "int": "7" } ] },
                     { "prim": "CAR" },
                     { "prim": "SOME" },
                     { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "network_info" } ] },
                     { "prim": "UPDATE" },
                     { "prim": "SOME" },
-                    { "prim": "DIG", "args": [ { "int": "5" } ] },
+                    { "prim": "DUP", "args": [ { "int": "6" } ] },
                     { "prim": "UPDATE" },
                     { "prim": "SOME" },
                     { "prim": "SWAP" },
                     { "prim": "UPDATE" },
-                    { "prim": "UPDATE", "args": [ { "int": "4" } ] }
+                    { "prim": "UPDATE", "args": [ { "int": "4" } ] },
+                    { "prim": "DUG", "args": [ { "int": "2" } ] }
                   ],
                   [
                     { "prim": "DIG", "args": [ { "int": "3" } ] },
@@ -145,22 +146,23 @@
                     { "prim": "DIG", "args": [ { "int": "4" } ] },
                     { "prim": "UPDATE" },
                     { "prim": "UPDATE", "args": [ { "int": "4" } ] },
-                    { "prim": "DUG", "args": [ { "int": "2" } ] },
-                    { "prim": "DUP", "args": [ { "int": "3" } ] },
-                    { "prim": "GET", "args": [ { "int": "3" } ] },
-                    { "prim": "EMPTY_MAP", "args": [ { "prim": "string" }, { "prim": "map", "args": [ { "prim": "string" }, { "prim": "string" } ] } ] },
-                    { "prim": "DIG", "args": [ { "int": "3" } ] },
-                    { "prim": "CAR" },
-                    { "prim": "SOME" },
-                    { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "network_info" } ] },
-                    { "prim": "UPDATE" },
-                    { "prim": "SOME" },
-                    { "prim": "DIG", "args": [ { "int": "2" } ] },
-                    { "prim": "UPDATE" },
-                    { "prim": "UPDATE", "args": [ { "int": "3" } ] }
+                    { "prim": "DUG", "args": [ { "int": "2" } ] }
                   ]
                 ]
-              }
+              },
+              { "prim": "DIG", "args": [ { "int": "2" } ] },
+              { "prim": "DUP" },
+              { "prim": "GET", "args": [ { "int": "3" } ] },
+              { "prim": "EMPTY_MAP", "args": [ { "prim": "string" }, { "prim": "map", "args": [ { "prim": "string" }, { "prim": "string" } ] } ] },
+              { "prim": "DIG", "args": [ { "int": "4" } ] },
+              { "prim": "CAR" },
+              { "prim": "SOME" },
+              { "prim": "PUSH", "args": [ { "prim": "string" }, { "string": "network_info" } ] },
+              { "prim": "UPDATE" },
+              { "prim": "SOME" },
+              { "prim": "DIG", "args": [ { "int": "3" } ] },
+              { "prim": "UPDATE" },
+              { "prim": "UPDATE", "args": [ { "int": "3" } ] }
             ]
           ]
         },

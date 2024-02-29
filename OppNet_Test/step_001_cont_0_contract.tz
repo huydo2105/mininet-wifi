@@ -52,18 +52,19 @@ code
               }
               {}; # @some : string : map string (map string (map string (map string string))) : @storage : string : @parameter%store_network_info
             EMPTY_MAP string (map string string); # map string (map string string) : @some : string : map string (map string (map string (map string string))) : @storage : string : @parameter%store_network_info
-            DIG 6;      # @parameter%store_network_info : map string (map string string) : @some : string : map string (map string (map string (map string string))) : @storage : string
-            CAR;        # map string string : map string (map string string) : @some : string : map string (map string (map string (map string string))) : @storage : string
-            SOME;       # option (map string string) : map string (map string string) : @some : string : map string (map string (map string (map string string))) : @storage : string
-            PUSH string "network_info"; # string : option (map string string) : map string (map string string) : @some : string : map string (map string (map string (map string string))) : @storage : string
-            UPDATE;     # map string (map string string) : @some : string : map string (map string (map string (map string string))) : @storage : string
-            SOME;       # option (map string (map string string)) : @some : string : map string (map string (map string (map string string))) : @storage : string
-            DIG 5;      # string : option (map string (map string string)) : @some : string : map string (map string (map string (map string string))) : @storage
-            UPDATE;     # map string (map string (map string string)) : string : map string (map string (map string (map string string))) : @storage
-            SOME;       # option (map string (map string (map string string))) : string : map string (map string (map string (map string string))) : @storage
-            SWAP;       # string : option (map string (map string (map string string))) : map string (map string (map string (map string string))) : @storage
-            UPDATE;     # map string (map string (map string (map string string))) : @storage
-            UPDATE 4;   # @storage
+            DUP 7;      # @parameter%store_network_info : map string (map string string) : @some : string : map string (map string (map string (map string string))) : @storage : string : @parameter%store_network_info
+            CAR;        # map string string : map string (map string string) : @some : string : map string (map string (map string (map string string))) : @storage : string : @parameter%store_network_info
+            SOME;       # option (map string string) : map string (map string string) : @some : string : map string (map string (map string (map string string))) : @storage : string : @parameter%store_network_info
+            PUSH string "network_info"; # string : option (map string string) : map string (map string string) : @some : string : map string (map string (map string (map string string))) : @storage : string : @parameter%store_network_info
+            UPDATE;     # map string (map string string) : @some : string : map string (map string (map string (map string string))) : @storage : string : @parameter%store_network_info
+            SOME;       # option (map string (map string string)) : @some : string : map string (map string (map string (map string string))) : @storage : string : @parameter%store_network_info
+            DUP 6;      # string : option (map string (map string string)) : @some : string : map string (map string (map string (map string string))) : @storage : string : @parameter%store_network_info
+            UPDATE;     # map string (map string (map string string)) : string : map string (map string (map string (map string string))) : @storage : string : @parameter%store_network_info
+            SOME;       # option (map string (map string (map string string))) : string : map string (map string (map string (map string string))) : @storage : string : @parameter%store_network_info
+            SWAP;       # string : option (map string (map string (map string string))) : map string (map string (map string (map string string))) : @storage : string : @parameter%store_network_info
+            UPDATE;     # map string (map string (map string (map string string))) : @storage : string : @parameter%store_network_info
+            UPDATE 4;   # @storage : string : @parameter%store_network_info
+            DUG 2;      # string : @parameter%store_network_info : @storage
           }
           {
             # self.data.timestamps[timestamp] = { # string : string : @parameter%store_network_info : @storage
@@ -85,20 +86,21 @@ code
             UPDATE;     # map string (map string (map string (map string string))) : @storage : string : @parameter%store_network_info
             UPDATE 4;   # @storage : string : @parameter%store_network_info
             DUG 2;      # string : @parameter%store_network_info : @storage
-            # self.data.latest_infor = sp.update_map( # string : @parameter%store_network_info : @storage
-            DUP 3;      # @storage : string : @parameter%store_network_info : @storage
-            GET 3;      # map string (map string (map string string)) : string : @parameter%store_network_info : @storage
-            EMPTY_MAP string (map string string); # map string (map string string) : map string (map string (map string string)) : string : @parameter%store_network_info : @storage
-            DIG 3;      # @parameter%store_network_info : map string (map string string) : map string (map string (map string string)) : string : @storage
-            CAR;        # map string string : map string (map string string) : map string (map string (map string string)) : string : @storage
-            SOME;       # option (map string string) : map string (map string string) : map string (map string (map string string)) : string : @storage
-            PUSH string "network_info"; # string : option (map string string) : map string (map string string) : map string (map string (map string string)) : string : @storage
-            UPDATE;     # map string (map string string) : map string (map string (map string string)) : string : @storage
-            SOME;       # option (map string (map string string)) : map string (map string (map string string)) : string : @storage
-            DIG 2;      # string : option (map string (map string string)) : map string (map string (map string string)) : @storage
-            UPDATE;     # map string (map string (map string string)) : @storage
-            UPDATE 3;   # @storage
-          }; # @storage
+          }; # string : @parameter%store_network_info : @storage
+        # self.data.latest_infor[station_name] = { # string : @parameter%store_network_info : @storage
+        DIG 2;      # @storage : string : @parameter%store_network_info
+        DUP;        # @storage : @storage : string : @parameter%store_network_info
+        GET 3;      # map string (map string (map string string)) : @storage : string : @parameter%store_network_info
+        EMPTY_MAP string (map string string); # map string (map string string) : map string (map string (map string string)) : @storage : string : @parameter%store_network_info
+        DIG 4;      # @parameter%store_network_info : map string (map string string) : map string (map string (map string string)) : @storage : string
+        CAR;        # map string string : map string (map string string) : map string (map string (map string string)) : @storage : string
+        SOME;       # option (map string string) : map string (map string string) : map string (map string (map string string)) : @storage : string
+        PUSH string "network_info"; # string : option (map string string) : map string (map string string) : map string (map string (map string string)) : @storage : string
+        UPDATE;     # map string (map string string) : map string (map string (map string string)) : @storage : string
+        SOME;       # option (map string (map string string)) : map string (map string (map string string)) : @storage : string
+        DIG 3;      # string : option (map string (map string string)) : map string (map string (map string string)) : @storage
+        UPDATE;     # map string (map string (map string string)) : @storage
+        UPDATE 3;   # @storage
       }; # @storage
     NIL operation; # list operation : @storage
     PAIR;       # pair (list operation) @storage
