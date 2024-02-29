@@ -1,31 +1,29 @@
 import os
 import time
 import json
+from dotenv import load_dotenv
 from pytezos import pytezos
 from threading import Thread
 import logging
 from datetime import datetime
+
+# Load environment variables from .env
+load_dotenv()
+
+# Fetch the key from the environment variable
+PYTEZOS_KEY = os.environ["PYTEZOS_KEY"]
+
+if not PYTEZOS_KEY:
+    raise ValueError("PYTEZOS_KEY environment variable is not set")
 
 CONTRACT_CODE_PATH = "../contract/main.py"
 CONTRACT_ADDRESS = "KT1JnScpF8zQzmYKwXKwYpHyu7eWoeeoLC4T"
 CONTRACT_STORAGE = {"timestamps": {}, "latest_info": {}, "distances": {}}
 NODE_URL = "https://ghostnet.ecadinfra.com"
 
-pytezos = pytezos.using(key="edskS1Vw8yMGpJTEWh4M7Yzu1h8HVPcwPPxZxFLUx41V4Pctyss8zQDgi2LvXtfzJHhFzMwgwJ6VXezidniysoVApJo7vDYN3G")
-
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-# Create a custom formatter
-formatter = logging.Formatter('%(levelname)s:%(name)s:%(asctime)s %(message)s', datefmt='%d-%m-%Y %H:%M:%S')
-
-# Create a handler that uses the custom formatter
-handler = logging.StreamHandler()
-handler.setFormatter(formatter)
-
-# Add the handler to the logger
-logger.addHandler(handler)
 
 def read_network_information(file_path):
     with open(file_path, "r") as json_file:
@@ -66,7 +64,7 @@ def update_contract(network_info, contract):
 
     # Perform bulk operation for store_network_info and store_distances_info calls
     pytezos.bulk(*stored_network_info, *stored_distances).send(min_confirmations=1)
-    logger.info("Bulk operation for store_network_info and store_distances_info completed")
+    logger.info(f"{datetime.now().strftime('%d-%m-%Y %H:%M:%S')} Bulk operation for store_network_info and store_distances_info completed")
 
 def listen_for_changes(file_path, contract):
     last_updated_time = 0
@@ -89,7 +87,7 @@ def listen_for_changes(file_path, contract):
         time.sleep(5)  # Sleep for 5 seconds before checking for changes
 
 def main():
-    logger.info("Server is running")
+    logger.info(f"{datetime.now().strftime('%d-%m-%Y %H:%M:%S')} Server is running")
     # Load the existing contract using the provided CONTRACT_ADDRESS
     py = pytezos.using(shell=NODE_URL)
     contract = py.contract(CONTRACT_ADDRESS)
