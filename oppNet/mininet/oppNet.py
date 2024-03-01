@@ -43,7 +43,8 @@ def calculate_distance(net, sta1, sta2):
 
 
 def track_network_information(net, file_path):
-    savedElement = 0
+    signal_file_path = "simulation_complete.signal"  # Signal file path
+
     while True:
         timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
         network_info = {"timestamp": timestamp, "stations": {}, "distances": []}
@@ -62,16 +63,16 @@ def track_network_information(net, file_path):
                         network_info["distances"].append({"staX": sta1.name, "staY": sta2.name, "distance": distance})
                         recorded_distances.add(distance_pair)
 
-        # Write the information to the JSON file
-        with open(file_path, "a+") as json_file:
-            # Check if the file is not empty, then add a comma
-            if json_file.tell() != 0 and savedElement != 0:
-                json_file.write(",")
+        # Write the information to the JSON file, overwriting the existing content
+        with open(file_path, "w") as json_file:
             json.dump(network_info, json_file, indent=2)
-            json_file.flush()  # Flush the buffer to ensure data is written immediately
-            savedElement += 1
 
-        time.sleep(5)  # Sleep for 5 seconds before the next iteration
+        # Create the signal file to indicate completion
+        with open(signal_file_path, "w"):
+            pass
+
+        # Sleep for 5 seconds before the next iteration
+        time.sleep(60)
 
 def topology(args):
     "Create a network."
@@ -156,9 +157,6 @@ def topology(args):
 
     ## Open file for writing network information
     file_path = "network_information.json"
-    # Opem the file and write "["
-    with open(file_path, "w") as json_file:
-        json_file.write("[")  # Clear the file content
 
     # Start tracking network information in a separate thread
     tracking_thread = threading.Thread(target=track_network_information, args=(net, file_path))
@@ -169,10 +167,6 @@ def topology(args):
 
     # Stop tracking thread when CLI is exited
     tracking_thread.join()
-
-    # Close the file after the CLI is done
-    with open(file_path, "w") as json_file:
-        json_file.write("]")  # Clear the file content
 
     info("*** Stopping network\n")
     net.stop()

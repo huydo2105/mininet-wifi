@@ -67,24 +67,25 @@ def update_contract(network_info, contract):
     logger.info(f"{datetime.now().strftime('%d-%m-%Y %H:%M:%S')} Bulk operation for store_network_info and store_distances_info completed")
 
 def listen_for_changes(file_path, contract):
-    last_updated_time = 0
+    signal_file_path = "simulation_complete.signal"
 
     while True:
+        # Wait until the signal file is created by the simulator
+        while not os.path.exists(signal_file_path):
+            time.sleep(1)
+
         try:
             # Read the content of the JSON file
             network_info = read_network_information(file_path)
 
-            for element in network_info:
-                # Update the contract with the new network information
-                update_contract(element, contract)
-
-                # Update the last updated time
-                last_updated_time = os.path.getmtime(file_path)
+            # Update the contract with the new network information
+            update_contract(network_info, contract)
 
         except Exception as e:
             logger.error(f"Error: {e}")
 
-        time.sleep(5)  # Sleep for 5 seconds before checking for changes
+        # Remove the signal file to indicate the content has been read
+        os.remove(signal_file_path)
 
 def main():
     logger.info(f"{datetime.now().strftime('%d-%m-%Y %H:%M:%S')} Server is running")
