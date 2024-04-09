@@ -1,295 +1,304 @@
 {
-  "timestamp": "2024-03-01 16:46:07",
+  "timestamp": "2024-04-05 15:46:01",
   "stations": {
     "sta1": {
       "coordination": [
-        29.57,
-        53.47,
+        98.93,
+        18.73,
         0.0
       ],
       "frequency": 2.432,
       "mode": "g",
       "tx_power": 15,
       "range": 48.436924929420485,
-      "antenna_gain": 5
+      "antenna_gain": 5,
+      "status": "online"
     },
     "sta2": {
       "coordination": [
-        64.54,
-        16.73,
+        130.52,
+        61.36,
         0.0
       ],
       "frequency": 2.432,
       "mode": "g",
       "tx_power": 15,
       "range": 48.436924929420485,
-      "antenna_gain": 5
+      "antenna_gain": 5,
+      "status": "online"
     },
     "sta3": {
       "coordination": [
-        39.01,
-        75.71,
+        163.96,
+        115.36,
         0.0
       ],
       "frequency": 2.432,
       "mode": "g",
       "tx_power": 15,
       "range": 48.436924929420485,
-      "antenna_gain": 5
+      "antenna_gain": 5,
+      "status": "online"
     },
     "sta4": {
       "coordination": [
-        24.65,
-        107.12,
+        92.42,
+        67.94,
         0.0
       ],
       "frequency": 2.432,
       "mode": "g",
       "tx_power": 15,
       "range": 48.436924929420485,
-      "antenna_gain": 5
+      "antenna_gain": 5,
+      "status": "online"
     },
     "sta5": {
       "coordination": [
-        136.99,
-        27.85,
+        162.84,
+        102.37,
         0.0
       ],
       "frequency": 2.432,
       "mode": "g",
       "tx_power": 15,
       "range": 48.436924929420485,
-      "antenna_gain": 5
+      "antenna_gain": 5,
+      "status": "online"
     },
     "sta6": {
       "coordination": [
-        70.31,
-        37.19,
+        26.92,
+        119.48,
         0.0
       ],
       "frequency": 2.432,
       "mode": "g",
       "tx_power": 15,
       "range": 48.436924929420485,
-      "antenna_gain": 5
+      "antenna_gain": 5,
+      "status": "online"
     },
     "sta7": {
       "coordination": [
-        55.2,
-        157.71,
+        89.38,
+        153.89,
         0.0
       ],
       "frequency": 2.432,
       "mode": "g",
       "tx_power": 15,
       "range": 48.436924929420485,
-      "antenna_gain": 5
+      "antenna_gain": 5,
+      "status": "online"
     },
     "sta8": {
       "coordination": [
-        200.93,
-        45.63,
+        89.92,
+        23.38,
         0.0
       ],
       "frequency": 2.432,
       "mode": "g",
       "tx_power": 15,
       "range": 48.436924929420485,
-      "antenna_gain": 5
+      "antenna_gain": 5,
+      "status": "online"
     },
     "sta9": {
       "coordination": [
-        -2378746.68,
-        73.02,
+        79.54,
+        99.46,
         0.0
       ],
-      "frequency": 2.432,
+      "frequency": 2.4,
       "mode": "g",
-      "tx_power": 15,
-      "range": 48.436924929420485,
-      "antenna_gain": 5
+      "tx_power": 14,
+      "range": 46.29253164143223,
+      "antenna_gain": 5,
+      "status": "online"
     }
   },
   "distances": [
     {
       "staX": "sta1",
       "staY": "sta2",
-      "distance": 50.72207113279189
+      "distance": 53.05888238551581
     },
     {
       "staX": "sta1",
       "staY": "sta3",
-      "distance": 24.160529795515654
+      "distance": 116.47427956420249
     },
     {
       "staX": "sta1",
       "staY": "sta4",
-      "distance": 53.87512320171528
+      "distance": 49.63873688965101
     },
     {
       "staX": "sta1",
       "staY": "sta5",
-      "distance": 110.4329697146645
+      "distance": 105.26223301830528
     },
     {
       "staX": "sta1",
       "staY": "sta6",
-      "distance": 43.872383112842186
+      "distance": 123.83861514083561
     },
     {
       "staX": "sta1",
       "staY": "sta7",
-      "distance": 107.34465287102103
+      "distance": 135.4969671247294
     },
     {
       "staX": "sta1",
       "staY": "sta8",
-      "distance": 171.5392526508146
+      "distance": 10.139161701048074
     },
     {
       "staX": "sta1",
       "staY": "sta9",
-      "distance": 2378776.250080336
+      "distance": 83.02592968464731
     },
     {
       "staX": "sta2",
       "staY": "sta3",
-      "distance": 64.26835379873985
+      "distance": 63.515616977244264
     },
     {
       "staX": "sta2",
       "staY": "sta4",
-      "distance": 98.80062854051081
+      "distance": 38.66401944961233
     },
     {
       "staX": "sta2",
       "staY": "sta5",
-      "distance": 73.29840994182616
+      "distance": 52.21496433016114
     },
     {
       "staX": "sta2",
       "staY": "sta6",
-      "distance": 21.258045535749513
+      "distance": 118.7892857121382
     },
     {
       "staX": "sta2",
       "staY": "sta7",
-      "distance": 141.2890512389407
+      "distance": 101.26352008497433
     },
     {
       "staX": "sta2",
       "staY": "sta8",
-      "distance": 139.4182272875394
+      "distance": 55.59532714176616
     },
     {
       "staX": "sta2",
       "staY": "sta9",
-      "distance": 2378811.220665998
+      "distance": 63.64409163465215
     },
     {
       "staX": "sta3",
       "staY": "sta4",
-      "distance": 34.53690345123605
+      "distance": 85.8290626769278
     },
     {
       "staX": "sta3",
       "staY": "sta5",
-      "distance": 109.04430292316974
+      "distance": 13.0381938933274
     },
     {
       "staX": "sta3",
       "staY": "sta6",
-      "distance": 49.633460487860404
+      "distance": 137.1019182943842
     },
     {
       "staX": "sta3",
       "staY": "sta7",
-      "distance": 83.58298929806233
+      "distance": 83.94484677453406
     },
     {
       "staX": "sta3",
       "staY": "sta8",
-      "distance": 164.69029358161944
+      "distance": 118.07727130993501
     },
     {
       "staX": "sta3",
       "staY": "sta9",
-      "distance": 2378785.690001521
+      "distance": 85.904286272572
     },
     {
       "staX": "sta4",
       "staY": "sta5",
-      "distance": 137.49184884930452
+      "distance": 78.38623157162233
     },
     {
       "staX": "sta4",
       "staY": "sta6",
-      "distance": 83.5167079092561
+      "distance": 83.34639524298576
     },
     {
       "staX": "sta4",
       "staY": "sta7",
-      "distance": 59.098651422853976
+      "distance": 86.00374468591468
     },
     {
       "staX": "sta4",
       "staY": "sta8",
-      "distance": 186.6967018990962
+      "distance": 44.63007506155463
     },
     {
       "staX": "sta4",
       "staY": "sta9",
-      "distance": 2378771.330244414
+      "distance": 34.050033773845215
     },
     {
       "staX": "sta5",
       "staY": "sta6",
-      "distance": 67.33095870400183
+      "distance": 136.99269506072216
     },
     {
       "staX": "sta5",
       "staY": "sta7",
-      "distance": 153.4705955549792
+      "distance": 89.725592781547
     },
     {
       "staX": "sta5",
       "staY": "sta8",
-      "distance": 66.36604553534887
+      "distance": 107.50230927752204
     },
     {
       "staX": "sta5",
       "staY": "sta9",
-      "distance": 2378883.6704288423
+      "distance": 83.35081343334329
     },
     {
       "staX": "sta6",
       "staY": "sta7",
-      "distance": 121.46350274876812
+      "distance": 71.31128732535963
     },
     {
       "staX": "sta6",
       "staY": "sta8",
-      "distance": 130.8923909171194
+      "distance": 114.90957314340699
     },
     {
       "staX": "sta6",
       "staY": "sta9",
-      "distance": 2378816.990269838
+      "distance": 56.29977619848947
     },
     {
       "staX": "sta7",
       "staY": "sta8",
-      "distance": 183.84547669170433
+      "distance": 130.51111715099216
     },
     {
       "staX": "sta7",
       "staY": "sta9",
-      "distance": 2378801.8815075653
+      "distance": 55.31229971715151
     },
     {
       "staX": "sta8",
       "staY": "sta9",
-      "distance": 2378947.6101576774
+      "distance": 76.78483444014189
     }
   ]
 }

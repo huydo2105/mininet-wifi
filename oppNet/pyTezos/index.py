@@ -16,7 +16,6 @@ PYTEZOS_KEY = os.environ["PYTEZOS_KEY"]
 if not PYTEZOS_KEY:
     raise ValueError("PYTEZOS_KEY environment variable is not set")
 
-CONTRACT_CODE_PATH = "../contract/main.py"
 CONTRACT_ADDRESS = "KT1JnScpF8zQzmYKwXKwYpHyu7eWoeeoLC4T"
 CONTRACT_STORAGE = {"timestamps": {}, "latest_info": {}, "distances": {}}
 NODE_URL = "https://ghostnet.ecadinfra.com"
@@ -47,6 +46,10 @@ def update_contract(network_info, contract):
                 "position": ",".join(map(str, station_info["coordination"])),
                 'freq': str(station_info["frequency"]),
                 'mode': str(station_info["mode"]),
+                'tx_power': str(station_info["tx_power"]),
+                'range': str(station_info["range"]),
+                'antenna_gain': str(station_info["antenna_gain"]),
+                'status': 'online' if station_info["status"] == "online" else "offline"
             }
         )
         for station_name, station_info in stations.items()

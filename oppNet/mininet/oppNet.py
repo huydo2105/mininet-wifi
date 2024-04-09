@@ -10,45 +10,27 @@ import time
 import threading
 import math
 import json
-import os
 from mininet.log import setLogLevel, info
 from mn_wifi.cli import CLI
 from mn_wifi.net import Mininet_wifi
 from mn_wifi.link import adhoc
 from mn_wifi.mobility import Mobility
+import argparse
+import random
 
-def track_station_information(station):
-    return {
-            "coordination": station.position,
-            # "parameters": station.params,
-            "frequency": station.wintfs[0].freq,
-            "mode": station.wintfs[0].mode,
-            "tx_power": station.wintfs[0].txpower,
-            "range": station.wintfs[0].range,
-            "antenna_gain": station.wintfs[0].antennaGain
-    }
+# caution: path[0] is reserved for script path (or '' in REPL)
+sys.path.insert(1, '/home/huydq/Mininet/mininet-wifi/oppNet/utils')
 
-
-def calculate_distance(net, sta1, sta2):
-    pos1 = sta1.position
-    pos2 = sta2.position
-    # Extract coordinates from the positions
-    x1, y1, z1 = pos1
-    x2, y2, z2 = pos2
-
-    # Calculate the Euclidean distance
-    distance = math.sqrt((x2 - x1)**2 + (y2 - y1)**2 + (z2 - z1)**2)
-    return distance
-
-
+from tezos import fetch_contract_storage
+from index import check_reachability, check_reachability_with_smart_contract, get_station_number, get_key
+from infor import track_station_information
 
 def track_network_information(net, file_path):
-    signal_file_path = "simulation_complete.signal"  # Signal file path
-
+    signal_file_path = "simulation_complete.signal"
     while True:
         timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
         network_info = {"timestamp": timestamp, "stations": {}, "distances": []}
-        recorded_distances = set()  # Set to store recorded distances
+        recorded_distances = set()
 
         for sta in net.stations:
             station_info = track_station_information(sta)
@@ -59,49 +41,40 @@ def track_network_information(net, file_path):
                 if sta1 != sta2:
                     distance_pair = frozenset({sta1.name, sta2.name})
                     if distance_pair not in recorded_distances:
-                        distance = calculate_distance(net, sta1, sta2)
+                        distance = calculate_distance(sta1, sta2)
                         network_info["distances"].append({"staX": sta1.name, "staY": sta2.name, "distance": distance})
                         recorded_distances.add(distance_pair)
 
-        # Write the information to the JSON file, overwriting the existing content
         with open(file_path, "w") as json_file:
             json.dump(network_info, json_file, indent=2)
 
-        # Create the signal file to indicate completion
         with open(signal_file_path, "w"):
             pass
 
-        # Sleep for 5 seconds before the next iteration
-        time.sleep(60)
+        time.sleep(600)
 
-def topology(args):
-    "Create a network."
+def topology(num_stations):
     net = Mininet_wifi()
 
     info("*** Creating nodes\n")
     kwargs = {}
-    if '-a' in args:
+    if '-a' in sys.argv:
         kwargs['range'] = 100
-    sta1 = net.addStation('sta1', mac='00:00:00:00:00:02', ip='10.0.0.2/8',
-                    min_x=10, max_x=30, min_y=50, max_y=70, min_v=5, max_v=10)
-    sta2 = net.addStation('sta2', ip='10.0.0.3/8',
-                   min_x=60, max_x=70, min_y=10, max_y=20, min_v=1, max_v=5)
-    sta3 = net.addStation('sta3', ip='10.0.0.4/8',
-                    min_x=30, max_x=40, min_y=5, max_y=80, min_v=3, max_v=8)
-    
-    sta4 = net.addStation('sta4', mac='00:00:00:00:00:05', ip='10.0.0.5/8',
-                    min_x=10, max_x=60, min_y=100, max_y=140, min_v=5, max_v=10)
-    sta5 = net.addStation('sta5', ip='10.0.0.6/8',
-                   min_x=120, max_x=140, min_y=20, max_y=40, min_v=1, max_v=5)
-    sta6 = net.addStation('sta6', ip='10.0.0.7/8',
-                    min_x=60, max_x=80, min_y=10, max_y=160, min_v=3, max_v=8)
 
-    sta7 = net.addStation('sta7', mac='00:00:00:00:00:08', ip='10.0.0.8/8',
-                    min_x=30, max_x=90, min_y=150, max_y=210, min_v=5, max_v=10)
-    sta8 = net.addStation('sta8', ip='10.0.0.9/8',
-                   min_x=180, max_x=210, min_y=30, max_y=60, min_v=1, max_v=5)
-    sta9 = net.addStation('sta9', ip='10.0.0.10/8',
-                    min_x=90, max_x=60, min_y=15, max_y=240, min_v=3, max_v=8)
+    stations = []
+    for i in range(1, num_stations + 1):
+        # Generate random values for station properties
+        min_x = random.uniform(0, 100)
+        max_x = random.uniform(min_x, 200)
+        min_y = random.uniform(0, 100)
+        max_y = random.uniform(min_y, 200)
+        min_v = random.uniform(1, 5)
+        max_v = random.uniform(min_v, 10)
+
+        station = net.addStation(f'sta{i}', ip=f'10.0.0.{i}/8',
+                                min_x=min_x, max_x=max_x, min_y=min_y, max_y=max_y, min_v=min_v, max_v=max_v)
+        
+        stations.append(station)
 
     c1 = net.addController('c1')
 
@@ -111,66 +84,44 @@ def topology(args):
     info("*** Configuring nodes\n")
     net.configureNodes()
 
-    if '-p' not in args:
+    if '-p' not in sys.argv:
         net.plotGraph()
 
-    net.setMobilityModel(time=0, model='RandomDirection',
-                         max_x=250, max_y=250, seed=20)
+    net.setMobilityModel(time=0, model='RandomDirection', max_x=250, max_y=250, seed=20)
 
     info("*** Associating and Creating links\n")
-    net.addLink(sta1, cls=adhoc, intf='sta1-wlan0',
-                ssid='adhocNet', mode='g', channel=5, **kwargs)
-    net.addLink(sta2, cls=adhoc, intf='sta2-wlan0',
-                ssid='adhocNet', mode='g', channel=5, **kwargs)
-    net.addLink(sta3, cls=adhoc, intf='sta3-wlan0',
-                ssid='adhocNet', mode='g', channel=5, **kwargs)
-
-    net.addLink(sta4, cls=adhoc, intf='sta4-wlan0',
-                ssid='adhocNet', mode='g', channel=5, **kwargs)
-    net.addLink(sta5, cls=adhoc, intf='sta5-wlan0',
-                ssid='adhocNet', mode='g', channel=5, **kwargs)
-    net.addLink(sta6, cls=adhoc, intf='sta6-wlan0',
-                ssid='adhocNet', mode='g', channel=5, **kwargs)
-    
-    net.addLink(sta7, cls=adhoc, intf='sta7-wlan0',
-                ssid='adhocNet', mode='g', channel=5, **kwargs)
-    net.addLink(sta8, cls=adhoc, intf='sta8-wlan0',
-                ssid='adhocNet', mode='g', channel=5, **kwargs)
-    net.addLink(sta9, cls=adhoc, intf='sta9-wlan0',
-                ssid='adhocNet', mode='g', channel=5, **kwargs)
+    for i in range(num_stations):
+        for j in range(i + 1, num_stations):
+            sta1 = stations[i]
+            sta2 = stations[j]
+            net.addLink(sta1, sta2, cls=adhoc, intf=f'sta{i + 1}-wlan0',
+                        ssid='adhocNet', mode='g', channel=5, **kwargs)
 
     info("*** Starting network\n")
     net.build()
 
-    info("\n*** Addressing...\n")
-    sta1.setIP('10.0.0.2/8', intf="sta1-wlan0")
-    sta2.setIP('10.0.0.3/8', intf="sta2-wlan0")
-    sta3.setIP('10.0.0.4/8', intf="sta3-wlan0")
+    for i in range(num_stations):
+        station = stations[i]
+        intf_name = f'sta{i + 1}-wlan0'
+        station.setIP(f'10.0.0.{i + 2}/8', intf=intf_name)
 
-    sta4.setIP('10.0.0.5/8', intf="sta4-wlan0")
-    sta5.setIP('10.0.0.6/8', intf="sta5-wlan0")
-    sta6.setIP('10.0.0.7/8', intf="sta6-wlan0")
-
-    sta7.setIP('10.0.0.8/8', intf="sta7-wlan0")
-    sta8.setIP('10.0.0.9/8', intf="sta8-wlan0")
-    sta9.setIP('10.0.0.10/8', intf="sta9-wlan0")
-
-    ## Open file for writing network information
     file_path = "network_information.json"
-
-    # Start tracking network information in a separate thread
     tracking_thread = threading.Thread(target=track_network_information, args=(net, file_path))
     tracking_thread.start()
 
     info("*** Running CLI\n")
     CLI(net)
 
-    # Stop tracking thread when CLI is exited
     tracking_thread.join()
 
     info("*** Stopping network\n")
     net.stop()
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Ad-hoc network simulation")
+    parser.add_argument('num_stations', type=int, help="Number of stations in the network")
+    parser.add_argument('-p', action='store_true', help="Plot the network graph")
+    args = parser.parse_args()
+
     setLogLevel('info')
-    topology(sys.argv)
+    topology(args.num_stations)
