@@ -11,7 +11,7 @@ offline_hosts = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]  # Example data for number of of
 # Plotting
 plt.figure(figsize=(8, 5))
 plt.plot(nodes, time_taken_without_smart_contract, marker='o', linestyle='-', color='b', label='Without Smart Contract')
-plt.plot(nodes, time_taken_with_smart_contract, marker='o', linestyle='-', color='r', label='With Smart Contract')
+plt.plot(nodes, time_taken_with_smart_contract, marker='s', linestyle='-', color='r', label='With Smart Contract')
 
 # Plotting number of offline hosts
 plt.plot(nodes, offline_hosts, marker='x', linestyle='--', color='g', label='Inconsistent Nodes')

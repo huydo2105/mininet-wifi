@@ -8,7 +8,7 @@ time_taken_with_smart_contract = [4.96836256980896, 5, 5, 4.98, 5.1, 4.99, 5.01,
 # Plotting
 plt.figure(figsize=(8, 5))
 plt.plot(nodes, time_taken_without_smart_contract, marker='o', linestyle='-', color='b', label='Without Smart Contract')
-plt.plot(nodes, time_taken_with_smart_contract, marker='o', linestyle='-', color='r', label='With Smart Contract')
+plt.plot(nodes, time_taken_with_smart_contract, marker='s', linestyle='-', color='r', label='With Smart Contract')
 
 # Adding labels and title
 plt.xlabel('Number of Nodes')
@@ -17,11 +17,13 @@ plt.title('Impact of Network Size on Checking Node Status')
 plt.legend()
 plt.grid(True)
 
+# Set integer values on x-axis
+plt.xticks(nodes)
+
 # Save the figure
 plt.savefig('node_status_security.png')
 
-# Set integer values on x-axis
-plt.xticks(nodes)
+
 
 # Show the plot
 plt.show()

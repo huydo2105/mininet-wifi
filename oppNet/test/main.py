@@ -8,7 +8,7 @@ time_taken_with_smart_contract = [4.96836256980896, 5, 7, 8.815, 10, 12, 15, 18,
 # Plotting
 plt.figure(figsize=(8, 5))
 plt.plot(nodes, time_taken_without_smart_contract, marker='o', linestyle='-', color='b', label='Without Smart Contract')
-plt.plot(nodes, time_taken_with_smart_contract, marker='o', linestyle='-', color='r', label='With Smart Contract')
+plt.plot(nodes, time_taken_with_smart_contract, marker='s', linestyle='-', color='r', label='With Smart Contract')
 
 # Adding labels and title
 plt.xlabel('Number of Nodes')
@@ -17,11 +17,14 @@ plt.title('Impact of Network Size on Route Finding')
 plt.legend()
 plt.grid(True)
 
-# Save the figure
-plt.savefig('route_finding_performance.png')
 
 # Set integer values on x-axis
 plt.xticks(nodes)
+
+# Save the figure
+plt.savefig('route_finding_performance.png')
+
+
 
 # Show the plot
 plt.show()
