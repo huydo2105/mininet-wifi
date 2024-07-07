@@ -40,7 +40,7 @@ def topology(args):
     # babel, batman_adv, batmand and olsr
     # WARNING: we may need to stop Network Manager if you want
     # to work with babel
-    protocols = ['babel', 'batman_adv', 'batmand', 'olsrd', 'olsrd2']
+    protocols = ['olsrd']
     kwargs = {}
     for proto in args:
         if proto in protocols:
@@ -48,12 +48,12 @@ def topology(args):
 
     net.addLink(sta1, cls=adhoc, intf='sta1-wlan0',
                 ssid='adhocNet', mode='g', channel=5,
-                ht_cap='HT40+', **kwargs)
+                ht_cap='HT40+', proto='batman_adv', **kwargs)
     net.addLink(sta2, cls=adhoc, intf='sta2-wlan0',
-                ssid='adhocNet', mode='g', channel=5,
+                ssid='adhocNet', mode='g', channel=5, proto='batman_adv',
                 **kwargs)
     net.addLink(sta3, cls=adhoc, intf='sta3-wlan0',
-                ssid='adhocNet', mode='g', channel=5,
+                ssid='adhocNet', mode='g', channel=5, proto='batman_adv',
                 ht_cap='HT40+', **kwargs)
 
     info("*** Starting network\n")

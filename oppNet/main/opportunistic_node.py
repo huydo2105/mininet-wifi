@@ -3,6 +3,7 @@ import time
 import threading
 import re
 from math import sqrt
+from scapy.all import IP, ICMP, send
 
 class OpportunisticNode:
     def __init__(self, name, net):
@@ -17,13 +18,13 @@ class OpportunisticNode:
     def send_packet(self, dest, message):
         if isinstance(dest, OpportunisticNode):
             dest = dest.node.name
-        message_with_dest = f"{dest}:{message}"
-        print(f"{self.name} sending packet to {dest} with message: {message_with_dest}")
+        print(f"{self.name} sending packet to {dest} with message: {message}")
         closest_neighbor = self.get_closest_neighbor()
         if closest_neighbor:
             print(f"{self.name} forwarding packet to closest neighbor {closest_neighbor.node.name}")
-            cmd = f'ping -c 1 -p {message_with_dest.encode().hex()} {closest_neighbor.node.IP()}'
-            result = self.execute_cmd(cmd)
+            # packet = IP(src=self.node.IP(), dst=closest_neighbor.node.IP()) / ICMP() / message
+            packet = IP(src=self.node.IP(), dst="192.168.123.3") / ICMP() / message
+            send(packet)
 
     def pkt_callback(self, sender_ip, hex_payload):
         print(f"{self.name} received packet from {sender_ip}: {hex_payload}")
@@ -135,6 +136,7 @@ class OpportunisticNode:
                     time.sleep(1)
                 else:
                     raise
+                    
     def setChannel(self, channel):
         "Set Channel"
         from mn_wifi.node import AP

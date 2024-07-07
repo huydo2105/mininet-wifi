@@ -64,38 +64,42 @@ def setup_network(num_stations):
 
     info("*** Creating nodes\n")
     stations = []
+    kwargs = {}
+    kwargs['range'] = 100
+
     for i in range(num_stations):
-        stations.append(net.addStation(f'sta{i+1}', position=f'{10 * (i+1)},40,0'))
+        stations.append(net.addStation(f'sta{i+1}', ip6=f'fe80::{i+1}', 
+                                        position=f'{10 + (i*10+1)},40,0',
+                                        **kwargs))
+
+    net.setPropagationModel(model="logDistance", exp=4)
+
 
     info("*** Configuring wifi nodes\n")
-    net.setPropagationModel(model="logDistance", exp=4)
     net.configureWifiNodes()
 
-    net.setMobilityModel(time=0, model='RandomDirection', max_x=250, max_y=250, seed=20)
+    # net.setMobilityModel(time=0, model='RandomDirection', max_x=250, max_y=250, seed=20)
 
     info("*** Creating ad-hoc links\n")
-    # MANET routing protocols supported by proto:
-    # babel, batman_adv, batmand and olsr
-    # WARNING: we may need to stop Network Manager if you want
-    # to work with babel
-    protocols = ['olsrd', 'olsrd2']
-    kwargs = {}
-    # kwargs['proto'] = protocols[0]
     for sta in stations:
-        net.addLink(sta, cls=adhoc, intf=f'{sta.name}-wlan0', ssid='adhocNet', mode='g', channel=5, ht_cap='HT40+', **kwargs)
+        net.addLink(sta, cls=adhoc, intf=f'{sta.name}-wlan0', ssid='adhocNet', mode='g', channel=5, ht_cap='HT40+', proto="batman_adv")
+
+    info("*** Setting Station TX Power\n")
+    for sta in stations:
+        sta.setTxPower(21, intf=f'{sta.name}-wlan0')
 
     info("*** Starting network\n")
     net.build()
     c0.start()
 
-    info("*** Starting the dynamic channel allocation thread with a delay to wait for stations's initializtion\n")
-    delay = 15  # Delay in seconds
-    channel_thread = threading.Thread(target=delayed_start, args=(stations, net, delay))
-    channel_thread.daemon = True
-    channel_thread.start()
+    info("\n*** Addressing...\n")
+    for i in range(num_stations):
+        stations[i].setIP6(f'2001::{i+1}/64', intf=f"sta{i+1}-wlan0")
+
+    # info("*** Starting the dynamic channel allocation thread with a delay to wait for stations's initializtion\n")
+    # delay = 15  # Delay in seconds
+    # channel_thread = threading.Thread(target=delayed_start, args=(stations, net, delay))
+    # channel_thread.daemon = True
+    # channel_thread.start()
 
     return net, stations
-
-def start_scapy_on_station(station, name, interface, ip, nodeRange):
-    scapy_script = "/home/huydq/Mininet/mininet-wifi/oppNet/mininet/sta1.scapy"
-    station.cmd(f'xterm -hold -e python3 {scapy_script} {name} {interface} {ip} {nodeRange}&')
