@@ -1,5 +1,5 @@
 import math
-from tezos import fetch_contract_storage
+from storage import fetch_latest_info, fetch_distance 
 def check_reachability(station1, station2, net, timeout=15):
     # Check if stations are in each other's coverage range and can reach each other
     distances_output = net.pingFull([net.get(station1), net.get(station2)], timeout)
@@ -118,43 +118,43 @@ def find_route_without_smart_contract(net, sta_start, sta_end):
     print(f"No route found between {sta_start_info.name} and {sta_end_info.name}")
     return None, None
 
-def find_route_with_smart_contract(net, sta_start, sta_end):
-    # Fetch distances from the smart contract
-    distances, latest_infor = fetch_contract_storage()
+# def find_route_with_smart_contract(net, sta_start, sta_end):
+#     # Fetch distances from the smart contract
+#     distances, latest_infor = fetch_contract_storage()
 
-    # Convert distances from strings to floats
-    for edge, distance_str in distances.items():
-        distances[edge] = float(distance_str)
+#     # Convert distances from strings to floats
+#     for edge, distance_str in distances.items():
+#         distances[edge] = float(distance_str)
 
-    # Implement flooding method to find the route
-    visited = set()
-    queue = [[sta_start]]
+#     # Implement flooding method to find the route
+#     visited = set()
+#     queue = [[sta_start]]
 
-    while queue:
-        path = queue.pop(0)
-        node = path[-1]
+#     while queue:
+#         path = queue.pop(0)
+#         node = path[-1]
 
-        if node == sta_end:
-            return path, distances[sta_start][sta_end]
+#         if node == sta_end:
+#             return path, distances[sta_start][sta_end]
 
-        if node not in visited:
-            # Check reachability from the current station to every other station
-            neighbors = []
-            for other_sta in net.stations:
-                if other_sta.name != node and other_sta.name not in path:
-                    if check_reachability_with_smart_contract(node, other_sta.name, latest_infor, distances):
-                        neighbors.append(other_sta.name)
+#         if node not in visited:
+#             # Check reachability from the current station to every other station
+#             neighbors = []
+#             for other_sta in net.stations:
+#                 if other_sta.name != node and other_sta.name not in path:
+#                     if check_reachability_with_smart_contract(node, other_sta.name, latest_infor, distances):
+#                         neighbors.append(other_sta.name)
 
-            if neighbors:   
-                # Sort neighbors by distance (you can use a more sophisticated metric)
-                sorted_neighbors = sorted(neighbors, key=lambda neighbor: distances[get_key(node, neighbor)])
-                # Add the neighbor with the shortest path to the queue
-                new_path = list(path)
-                new_path.append(sorted_neighbors[0])
-                queue.append(new_path)
+#             if neighbors:   
+#                 # Sort neighbors by distance (you can use a more sophisticated metric)
+#                 sorted_neighbors = sorted(neighbors, key=lambda neighbor: distances[get_key(node, neighbor)])
+#                 # Add the neighbor with the shortest path to the queue
+#                 new_path = list(path)
+#                 new_path.append(sorted_neighbors[0])
+#                 queue.append(new_path)
 
-            visited.add(node)
+#             visited.add(node)
 
-    print(f"No route found between {sta_start} and {sta_end}")
-    return None, None
+#     print(f"No route found between {sta_start} and {sta_end}")
+#     return None, None
 

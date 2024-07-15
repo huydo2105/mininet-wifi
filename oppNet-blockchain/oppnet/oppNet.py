@@ -19,21 +19,23 @@ import argparse
 import random
 
 # caution: path[0] is reserved for script path (or '' in REPL)
-sys.path.insert(1, '/home/huydq/Mininet/mininet-wifi/oppNet/utils')
+sys.path.insert(1, '/home/huydq/Mininet/mininet-wifi/oppNet-blockchain/utils')
 
-from tezos import fetch_contract_storage
-from index import check_reachability, check_reachability_with_smart_contract, get_station_number, get_key
+# from storage import fetch_contract_storage
+from index import check_reachability, get_station_number, get_key, find_route_without_smart_contract, calculate_distance, check_node_status_without_smart_contract
 from infor import track_station_information
 
 def track_network_information(net, file_path):
     signal_file_path = "simulation_complete.signal"
+
+    online_stations = [sta for sta in net.stations if sta.intf().isUp() == True]
     while True:
         timestamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
         network_info = {"timestamp": timestamp, "stations": {}, "distances": []}
         recorded_distances = set()
 
         for sta in net.stations:
-            station_info = track_station_information(sta)
+            station_info = track_station_information(sta, online_stations)
             network_info["stations"][sta.name] = station_info
 
         for sta1 in net.stations:
@@ -42,7 +44,7 @@ def track_network_information(net, file_path):
                     distance_pair = frozenset({sta1.name, sta2.name})
                     if distance_pair not in recorded_distances:
                         distance = calculate_distance(sta1, sta2)
-                        network_info["distances"].append({"staX": sta1.name, "staY": sta2.name, "distance": distance})
+                        network_info["distances"].append({"staX": sta1.name, "staY": sta2.name, "distance": str(distance)})
                         recorded_distances.add(distance_pair)
 
         with open(file_path, "w") as json_file:
@@ -51,7 +53,7 @@ def track_network_information(net, file_path):
         with open(signal_file_path, "w"):
             pass
 
-        time.sleep(600)
+        time.sleep(60)
 
 def topology(num_stations):
     net = Mininet_wifi()
