@@ -1,8 +1,8 @@
 {
-  "timestamp": "2024-07-15 16:33:27",
+  "timestamp": "2024-07-15 16:35:27",
   "stations": {
     "sta1": {
-      "position": "14.25,135.27,0.0",
+      "position": "10.72,154.18,0.0",
       "frequency": "2.432",
       "mode": "g",
       "tx_power": "15",
@@ -11,7 +11,7 @@
       "status": "online"
     },
     "sta2": {
-      "position": "87.04,150.44,0.0",
+      "position": "68.87,164.35,0.0",
       "frequency": "2.432",
       "mode": "g",
       "tx_power": "15",
@@ -20,7 +20,7 @@
       "status": "online"
     },
     "sta3": {
-      "position": "98.62,79.29,0.0",
+      "position": "86.6,122.3,0.0",
       "frequency": "2.4",
       "mode": "g",
       "tx_power": "14",
@@ -33,17 +33,17 @@
     {
       "staX": "sta1",
       "staY": "sta2",
-      "distance": "74.35397097667347"
+      "distance": "59.03262996004837"
     },
     {
       "staX": "sta1",
       "staY": "sta3",
-      "distance": "101.25244342730699"
+      "distance": "82.30497433326858"
     },
     {
       "staX": "sta2",
       "staY": "sta3",
-      "distance": "72.08619077188084"
+      "distance": "45.635023830387105"
     }
   ]
 }

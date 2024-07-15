@@ -64,7 +64,7 @@ def update_contract(network_info):
         }
         
         tx_result = contract.execute(msg, sender=wallet, gas_limit=300000).wait_to_complete()
-        print(f"{datetime.now().strftime('%d-%m-%Y %H:%M:%S')} Distance information between {distance_info["staX"]} and {distance_info["staY"]} at {timestamp} has been stored")
+        print(f"{datetime.now().strftime('%d-%m-%Y %H:%M:%S')} Distance information between {distance_info['staX']} and {distance_info['staY']} at {timestamp} has been stored")
 
     # logger.info(f"{datetime.now().strftime('%d-%m-%Y %H:%M:%S')} Bulk operation for store_network_info and store_distances_info completed")
 
