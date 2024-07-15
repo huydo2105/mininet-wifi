@@ -1,17 +1,17 @@
 {
-  "timestamp": "2024-07-15 16:30:13",
+  "timestamp": "2024-07-15 16:32:27",
   "stations": {
     "sta1": {
-      "position": "25.51,43.74,0.0",
+      "position": "12.68,120.42,0.0",
       "frequency": "2.432",
       "mode": "g",
       "tx_power": "15",
       "range": "48.436924929420485",
       "antenna_gain": "5",
-      "status": "offline"
+      "status": "online"
     },
     "sta2": {
-      "position": "111.96,138.31,0.0",
+      "position": "56.01,89.96,0.0",
       "frequency": "2.432",
       "mode": "g",
       "tx_power": "15",
@@ -20,7 +20,7 @@
       "status": "online"
     },
     "sta3": {
-      "position": "170.92,108.74,0.0",
+      "position": "96.86,49.66,0.0",
       "frequency": "2.4",
       "mode": "g",
       "tx_power": "14",
@@ -33,17 +33,17 @@
     {
       "staX": "sta1",
       "staY": "sta2",
-      "distance": 128.12918246831984
+      "distance": "52.96508755774883"
     },
     {
       "staX": "sta1",
       "staY": "sta3",
-      "distance": 159.27670294176735
+      "distance": "109.96931390165169"
     },
     {
       "staX": "sta2",
       "staY": "sta3",
-      "distance": 65.95958232129733
+      "distance": "57.38303320668924"
     }
   ]
 }

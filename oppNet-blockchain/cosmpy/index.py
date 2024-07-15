@@ -56,8 +56,8 @@ def update_contract(network_info):
         msg = {
             "store_distances": {
                 "params": {
-                    "staX": distance_info["staX"],
-                    "staY": distance_info["staY"],
+                    "sta_x": distance_info["staX"],
+                    "sta_y": distance_info["staY"],
                     "distance": distance_info["distance"],
                 }
             }
