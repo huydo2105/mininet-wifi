@@ -7,6 +7,7 @@ from __future__ import division
 
 import warnings
 import matplotlib.cbook
+import math
 
 from sys import exit
 from math import atan2
@@ -15,7 +16,6 @@ from time import sleep
 from threading import Thread as thread
 from random import randrange
 from pylab import ginput as ginp, cos, sin, np
-import math
 from mininet.log import info
 
 from mn_wifi.mobility import Mobility
@@ -156,7 +156,7 @@ class vanet(Mobility):
 
     def display_cars(self, cars):
         car_lines = []
-
+        
         for _ in range(len(cars)):
             n = randint(0, len(self.roads)-1)
             car_lines.append(self.roads[n])
@@ -236,12 +236,11 @@ class vanet(Mobility):
         return ang
 
     def carProp(self, point, ang, x_min, x_max, y_min, y_max):
-        temp = [point[0], point[1], ang, x_min, x_max, y_min, y_max]
-        return temp
+
+        return [point[0], point[1], ang, x_min, x_max, y_min, y_max]
 
     def carPoint(self, point):
-        temp = [point[0], point[1]]
-        return temp
+        return [point[0], point[1]]
 
     def line_prop(self, line, car):
         line_data = line.get_data()  # Get the x and y values of the points in the line

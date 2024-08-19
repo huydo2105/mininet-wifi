@@ -36,7 +36,7 @@ class Mobility(object):
         node.position = init_pos
         pos_x = float(fin_pos[0]) - float(init_pos[0])
         pos_y = float(fin_pos[1]) - float(init_pos[1])
-        pos_z = float(fin_pos[2]) - float(init_pos[2])
+        pos_z = float(fin_pos[2]) - float(init_pos[2]) if len(fin_pos) == 3 else float(0)
 
         pos = round(pos_x/diff_time*0.1, 2),\
               round(pos_y/diff_time*0.1, 2),\
@@ -45,7 +45,10 @@ class Mobility(object):
 
     @staticmethod
     def get_position(pos):
-        return float('%s' % pos[0]), float('%s' % pos[1]), float('%s' % pos[2])
+        x = float('%s' % pos[0])
+        y = float('%s' % pos[1])
+        z = float('%s' % pos[2]) if len(pos) == 3 else float('%s' % 0)
+        return x, y, z
 
     @staticmethod
     def speed(node, pos_x, pos_y, pos_z, mob_time):
@@ -269,6 +272,25 @@ class model(Mobility):
             for key in args.keys():
                 setattr(node, key, node.params.get(key, args[key]))
 
+        # This is done to avoid needing to significantly refactor how mobility is started
+        # and prevent ugly code blocks to check whether individual values are placeholder
+        # rather than just being able to use get().
+        # We assume these values are always greater than or equal to 0 and none of the
+        # list/tuple/set args are allowed to be empty. Please raise an issue or add special handling
+        # if necessary.
+        model_args = dict()
+        model_arg_names = ['velocity_mean', 'alpha', 'variance', 'aggregation', 'g_velocity', 'ac_method', \
+                                'pointlist', 'n_groups', 'aggregation_epoch', 'epoch', 'velocity']
+        for argument in kwargs:
+            if argument in model_arg_names:
+                if isinstance(kwargs[argument], float):
+                    if kwargs[argument] >= 0:
+                        model_args[argument] = kwargs[argument]
+                # We assume that non-float arguments are lists/tuples/sets and check if it's empty
+                else:
+                    if kwargs[argument]:
+                        model_args[argument] = kwargs[argument]
+
         if draw:
             nodes = mob_nodes + stat_nodes
             PlotGraph(nodes=nodes, max_x=max_x, max_y=max_y, **kwargs)
@@ -299,17 +321,33 @@ class model(Mobility):
                         setattr(node, param, '1')
             mob = random_waypoint(mob_nodes, wt_min=min_wt, wt_max=max_wt)
         elif mob_model == 'GaussMarkov':  # Gauss-Markov model
-            mob = gauss_markov(mob_nodes, alpha=0.99)
+            velocity_mean = model_args.get("velocity_mean", 1.)
+            alpha = model_args.get("alpha", 0.99)
+            variance = model_args.get("variance", 1.)
+            mob = gauss_markov(mob_nodes, velocity_mean=velocity_mean, alpha=alpha, variance=variance)
         elif mob_model == 'ReferencePoint':  # Reference Point Group model
+            aggregation = model_args.get("aggregation", 0.5)
+            velocity = model_args.get("velocity", (0.1, 1))
             mob = reference_point_group(mob_nodes, n_groups,
                                         dimensions=(max_x, max_y),
-                                        aggregation=0.5)
+                                        velocity=velocity,
+                                        aggregation=aggregation)
         elif mob_model == 'TimeVariantCommunity':
+            aggregation = model_args.get("aggregation_epoch", [0.5, 0.0])
+            epoch = model_args.get("epoch", [100, 100])
+            velocity = model_args.get("velocity", (0.1, 1))
             mob = tvc(mob_nodes, n_groups, dimensions=(max_x, max_y),
-                      aggregation=[0.5, 0.], epoch=[100, 100])
+                      aggregation=aggregation, epoch=epoch)
         elif mob_model == 'CRP':
-            mob = coherence_ref_point(mob_nodes, n_groups, (max_x, max_y),
-                                      kwargs['pointlist'])
+            if "pointlist" not in kwargs:
+                raise Exception("Point list argument required for this model")
+            pointlist = kwargs["pointlist"]
+            velocity = model_args.get("velocity", (0.1, 1))
+            g_velocity = model_args.get("g_velocity", 0.4)
+            aggregation = model_args.get("aggregation", 0.1)
+            mob = coherence_ref_point(nodes=mob_nodes, n_groups=n_groups, dimensions=(max_x, max_y),
+                                      pointlist=pointlist, velocity=velocity, g_velocity=g_velocity,
+                                      aggregation=aggregation)
         else:
             raise Exception("Mobility Model not defined or doesn't exist!")
 
@@ -384,12 +422,10 @@ class Tracked(Mobility):
         for rep in range(mob_rep):
             t1 = time()
             i = 0.1
-            if reverse:
-                for node in mob_nodes:
-                    if rep % 2 == 1 or (rep % 2 == 0 and rep > 0):
-                        fin_pos = node.params['finPos']
-                        node.params['finPos'] = node.params['initPos']
-                        node.params['initPos'] = fin_pos
+
+            for node in mob_nodes:
+                node.time = 0
+                node.matrix_id = 0
 
             if not coordinate:
                 coordinate = {}
@@ -397,16 +433,28 @@ class Tracked(Mobility):
                     self.calculate_diff_time(node)
                     coordinate[node] = self.create_coord(node, tracked=True)
 
+            if reverse and rep % 2 == 1:
+                for node in mob_nodes:
+                    fin_pos = node.params['finPos']
+                    node.params['finPos'] = node.params['initPos']
+                    node.params['initPos'] = fin_pos
+
             while mob_start_time <= time() - t1 <= mob_stop_time:
                 t2 = time()
                 if t2 - t1 >= i:
                     for node, pos in coordinate.items():
                         if (t2 - t1) >= node.startTime and node.time <= node.endTime:
                             node.matrix_id += 1
-                            if node.matrix_id < len(coordinate[node]):
-                                pos = pos[node.matrix_id]
+                            if reverse and rep % 2 == 1:
+                                if node.matrix_id < len(coordinate[node]):
+                                    pos = list(reversed(coordinate[node]))[node.matrix_id]
+                                else:
+                                    pos = list(reversed(coordinate[node]))[-1]
                             else:
-                                pos = pos[len(coordinate[node]) - 1]
+                                if node.matrix_id < len(coordinate[node]):
+                                    pos = pos[node.matrix_id]
+                                else:
+                                    pos = pos[len(coordinate[node]) - 1]
                             self.set_pos(node, pos)
                             node.time += 0.1
                             if draw:
@@ -438,7 +486,7 @@ class Tracked(Mobility):
             for _ in range((node.endTime - node.startTime) * 10):
                 x = round(pos[0], 2) + round(node.moveFac[0], 2)
                 y = round(pos[1], 2) + round(node.moveFac[1], 2)
-                z = round(pos[2], 2) + round(node.moveFac[2], 2)
+                z = round(pos[2], 2) + round(node.moveFac[2], 2) if len(pos)==3 else 0
                 pos = (x, y, z)
                 coord.append((x, y, z))
         else:
@@ -460,8 +508,11 @@ class Tracked(Mobility):
         return t
 
     def get_points(self, node, a0, a1, total):
-        x1, y1, z1 = float(a0[0]), float(a0[1]), float(a0[2])
-        x2, y2, z2 = float(a1[0]), float(a1[1]), float(a1[2])
+        x1, y1 = float(a0[0]), float(a0[1])
+        z1 = float(a0[2]) if len(a0) > 2 else float(0)
+
+        x2, y2 = float(a1[0]), float(a1[1])
+        z2 = float(a1[2]) if len(a1) > 2 else float(0)
         points = []
         perc_dif = []
         ldelta = [0, 0, 0]
@@ -1135,7 +1186,7 @@ def heterogeneous_truncated_levy_walk(*args, **kwargs):
     return iter(HeterogeneousTruncatedLevyWalk(*args, **kwargs))
 
 
-def gauss_markov(nodes, velocity_mean=1., alpha=1., variance=1.):
+def gauss_markov(nodes, velocity_mean=1., alpha=0.99, variance=1.):
     """
     Gauss-Markov Mobility Model, as proposed in
     Camp, T., Boleng, J. & Davies, V. A survey of mobility models for ad hoc
@@ -1211,7 +1262,7 @@ def gauss_markov(nodes, velocity_mean=1., alpha=1., variance=1.):
 
 
 def reference_point_group(nodes, n_groups, dimensions,
-                          velocity=(0.1, 1.), aggregation=0.1):
+                          velocity=(0.1, 1.), aggregation=0.5):
     """
     Reference Point Group Mobility model, discussed in the following paper:
         Xiaoyan Hong, Mario Gerla, Guangyu Pei, and Ching-Chuan Chiang. 1999.
