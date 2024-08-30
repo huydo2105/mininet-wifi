@@ -44,6 +44,7 @@ from mn_wifi.wmediumdConnector import error_prob, snr, interference
 from mn_wifi.wwan.link import WWANLink
 from mn_wifi.wwan.net import Mininet_WWAN
 from mn_wifi.wwan.node import WWANNode
+import codecs
 
 VERSION = "2.6"
 
@@ -168,6 +169,7 @@ class Mininet_wifi(Mininet, Mininet_IoT, Mininet_WWAN):
         self.epoch = []
         self.velocity = ()
         self.initial_mediums = []
+        self.retry_queue = []
 
         if autoSetPositions and link == wmediumd:
             self.wmediumd_mode = interference
@@ -994,6 +996,51 @@ class Mininet_wifi(Mininet, Mininet_IoT, Mininet_WWAN):
         hosts = [nodes[0], nodes[1]]
         return self.pingFull(hosts=hosts)
 
+    def pingOppNet(self, src_node=None, dest_node=None, content="default message", timeout=None):
+        """Ping between specified source and destination nodes and return all data.
+        src_node: source node (host or station)
+        dest_node: destination node (host or station)
+        timeout: time to wait for a response, as string
+        returns: ping data and a boolean indicating if the packet reached the destination."""
+        
+        all_outputs = []
+        packet_reached = False  # Flag to indicate if the packet reached the destination
+        
+        if not src_node or not dest_node:
+            output('*** Ping: Source and destination nodes must be specified\n')
+            return all_outputs, packet_reached
+        
+        output('{} -> '.format(src_node.name))
+        
+        opts = ''
+        if timeout:
+            opts = '-W {}'.format(timeout)
+            
+        # Perform the ping command from src_node to dest_node with a custom payload
+        # Convert the content to hex using codecs
+        content_hex = codecs.encode(content.encode(), 'hex').decode()
+        # Use the ping command with a custom payload
+        result = src_node.cmd("ping -c1 {} {} -p {}".format(opts, dest_node.IP(), content_hex))
+        outputs = self._parsePingFull(result)
+        sent, received, rttmin, rttavg, rttmax, rttdev = outputs
+        all_outputs.append((src_node, dest_node, outputs))
+        
+        if received:
+            output(dest_node.name)
+            packet_reached = True  # Update the flag if the packet was received
+        else:
+            output('X ')
+        
+        output('\n*** Results: \n')
+        for outputs in all_outputs:
+            src, dest, ping_outputs = outputs
+            sent, received, rttmin, rttavg, rttmax, rttdev = ping_outputs
+            output(" {}->{}: {}/{}, ".format(src.name, dest.name, sent, received))
+            output("rtt min/avg/max/mdev %0.3f/%0.3f/%0.3f/%0.3f ms\n" %
+                (rttmin, rttavg, rttmax, rttdev))
+        
+        return all_outputs, packet_reached
+
     def iperf(self, hosts=None, l4Type='TCP', udpBw='10M', fmt=None,
               seconds=5, port=5001):
         """Run iperf between two hosts.
@@ -1080,6 +1127,50 @@ class Mininet_wifi(Mininet, Mininet_IoT, Mininet_WWAN):
         except KeyError:
             info("node {} or/and node {} does not exist or "
                  "there is no position defined\n".format(dst, src))
+
+    def get_distance_number(self, src, dst):
+        """
+        gets the distance between two nodes
+        :params src: source node
+        :params dst: destination node
+        """
+        nodes = self.get_mn_wifi_nodes()
+        try:
+            src = self.nameToNode[src]
+            if src in nodes:
+                dst = self.nameToNode[dst]
+                if dst in nodes:
+                    dist = src.get_distance_to(dst)
+                    return dist
+        except KeyError:
+            info("node {} or/and node {} does not exist or "
+                 "there is no position defined\n".format(dst, src))
+
+
+    # Helper functions
+    def get_nearest_node_to_dest(self, start_node, dest_node, exclude=None):
+        """Find the nearest node to the destination node 
+        from the start node using the distance function, 
+        excluding specified nodes.
+        :params start_node: start node
+        :params dest_node: destination node
+        :params exclude: excluded nodes
+        """
+        if exclude is None:
+            exclude = []
+        
+        nearest_node = None
+        min_distance = float('inf')
+        
+        for node in self.stations:
+            if node.name in exclude:
+                continue
+            distance = self.get_distance_number(start_node, node.name)
+            if distance < min_distance:
+                nearest_node = node
+                min_distance = distance
+        
+        return nearest_node.name
 
     def mobility(self, *args, **kwargs):
         "Configure mobility parameters"

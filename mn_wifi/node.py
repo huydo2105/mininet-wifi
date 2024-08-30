@@ -38,7 +38,7 @@ from mn_wifi.link import WirelessIntf, physicalMesh, ITSLink
 from mn_wifi.wmediumdConnector import w_server, w_pos, w_cst, wmediumd_mode
 
 from re import findall
-
+from queue import Queue
 
 class Node_wifi(Node):
     """A virtual network node is simply a shell in a network namespace.
@@ -72,6 +72,7 @@ class Node_wifi(Node):
         self.wintfs = {}  # dict of wireless port numbers
         self.wports = {}  # dict of interfaces to port numbers
         self.nameToIntf = {}  # dict of interface names to Intfs
+        self.packet_queue = Queue() # queue of not yet transferred packets
 
         # Make pylint happy
         (self.shell, self.execed, self.pid, self.stdin, self.stdout,
@@ -92,6 +93,9 @@ class Node_wifi(Node):
     # Class variables and methods
     inToNode = {}  # mapping of input fds to nodes
     outToNode = {}  # mapping of output fds to nodes
+
+    def append_packet_queue(self, packet):
+        self.packet_queue.put(packet)
 
     def get_wlan(self, intf):
         return self.params['wlan'].index(intf)

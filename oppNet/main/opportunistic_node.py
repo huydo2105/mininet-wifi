@@ -23,7 +23,7 @@ class OpportunisticNode:
         if closest_neighbor:
             print(f"{self.name} forwarding packet to closest neighbor {closest_neighbor.node.name}")
             # packet = IP(src=self.node.IP(), dst=closest_neighbor.node.IP()) / ICMP() / message
-            packet = IP(src=self.node.IP(), dst="192.168.123.3") / ICMP() / message
+            packet = IP(src=self.node.IP(), dst="192.168.123.2") / ICMP() / message
             send(packet)
 
     def pkt_callback(self, sender_ip, hex_payload):

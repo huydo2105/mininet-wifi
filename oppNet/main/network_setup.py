@@ -36,20 +36,20 @@ def monitor_and_allocate_channels(stations, net):
             if new_allocation[sta] != current_allocation[sta]:
                 try:
                     if sta.shell and not sta.waiting:
-                        intf_name = f"{sta.name}-wlan0" 
+                        intf_name = "{}-wlan0".format(sta.name) 
                         # sta.cmd(f'{sta.name}-wlan0 ibss join adhocNet 2412 02:CA:FF:EE:BA:01')
                         # sta.setChannel(new_allocation[sta], intf=intf_name)
                         # Remove the old ad-hoc link
-                        sta.pexec(f'iw dev {intf_name} ibss leave')
+                        sta.pexec('iw dev {} ibss leave'.format(intf_name))
                         # Set the new channel
                         sta.setChannel(new_allocation[sta])
                         # # Re-create the ad-hoc link with the new channel
                         # adhoc(node=sta, intf=intf_name, ssid='adhocNet', mode='g', channel=new_allocation[sta])
                         print(sta.params)
                         current_allocation[sta] = new_allocation[sta]
-                        info(f"*** Channel for {sta} changed to {new_allocation[sta]}\n")
+                        info("*** Channel for {} changed to {}\n".format(sta, new_allocation[sta]))
                 except Exception as e:
-                    info(f"Error setting channel for {sta}: {e}\n")
+                    info("Error setting channel for {}: {}\n".format(sta, e))
         time.sleep(60) 
 
 def delayed_start(stations, net, delay):
@@ -68,8 +68,10 @@ def setup_network(num_stations):
     kwargs['range'] = 100
 
     for i in range(num_stations):
-        stations.append(net.addStation(f'sta{i+1}', ip6=f'fe80::{i+1}', 
-                                        position=f'{10 + (i*10+1)},40,0',
+        x_pos = random.uniform(0, 100)  # Random X position between 0 and 100
+        y_pos = random.uniform(0, 100)  # Random Y position between 0 and 100
+        stations.append(net.addStation('sta{}'.format(i+1), ip6='fe80::{}'.format(i+1), 
+                                        position='{}, {}, 0'.format(x_pos, y_pos),
                                         **kwargs))
 
     net.setPropagationModel(model="logDistance", exp=4)
@@ -82,11 +84,11 @@ def setup_network(num_stations):
 
     info("*** Creating ad-hoc links\n")
     for sta in stations:
-        net.addLink(sta, cls=adhoc, intf=f'{sta.name}-wlan0', ssid='adhocNet', mode='g', channel=5, ht_cap='HT40+', proto="batman_adv")
+        net.addLink(sta, cls=adhoc, intf='{}-wlan0'.format(sta.name), ssid='adhocNet', mode='g', channel=5, ht_cap='HT40+')
 
-    info("*** Setting Station TX Power\n")
-    for sta in stations:
-        sta.setTxPower(21, intf=f'{sta.name}-wlan0')
+    # info("*** Setting Station TX Power\n")
+    # for sta in stations:
+    #     sta.setTxPower(21, intf='{}-wlan0'.format(sta.name))
 
     info("*** Starting network\n")
     net.build()
@@ -94,7 +96,7 @@ def setup_network(num_stations):
 
     info("\n*** Addressing...\n")
     for i in range(num_stations):
-        stations[i].setIP6(f'2001::{i+1}/64', intf=f"sta{i+1}-wlan0")
+        stations[i].setIP6('2001::{}/64'.format(i+1), intf="sta{}-wlan0".format(i+1))
 
     # info("*** Starting the dynamic channel allocation thread with a delay to wait for stations's initializtion\n")
     # delay = 15  # Delay in seconds
