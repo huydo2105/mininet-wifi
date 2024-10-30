@@ -24,7 +24,6 @@ import re
 import math
 import matplotlib.pyplot as plt
 
-from time import sleep
 from sys import exit
 from os import system as sh, getpid
 
@@ -36,9 +35,14 @@ from mininet.moduledeps import pathCheck
 from mininet.link import Intf
 from mn_wifi.link import WirelessIntf, physicalMesh, ITSLink
 from mn_wifi.wmediumdConnector import w_server, w_pos, w_cst, wmediumd_mode
+from mn_wifi.packet import SummaryVectorHeader, EpidemicHeader
 
 from re import findall
-from queue import Queue
+from Queue import Queue
+import json
+from time import time, sleep
+import os
+import random 
 
 class Node_wifi(Node):
     """A virtual network node is simply a shell in a network namespace.
@@ -72,7 +76,6 @@ class Node_wifi(Node):
         self.wintfs = {}  # dict of wireless port numbers
         self.wports = {}  # dict of interfaces to port numbers
         self.nameToIntf = {}  # dict of interface names to Intfs
-        self.packet_queue = Queue() # queue of not yet transferred packets
 
         # Make pylint happy
         (self.shell, self.execed, self.pid, self.stdin, self.stdout,
@@ -93,9 +96,6 @@ class Node_wifi(Node):
     # Class variables and methods
     inToNode = {}  # mapping of input fds to nodes
     outToNode = {}  # mapping of output fds to nodes
-
-    def append_packet_queue(self, packet):
-        self.packet_queue.put(packet)
 
     def get_wlan(self, intf):
         return self.params['wlan'].index(intf)
@@ -356,8 +356,8 @@ class Node_wifi(Node):
         self.intfs[port] = intf
         self.ports[intf] = port
         self.nameToIntf[intf.name] = intf
-        debug('\n')
-        debug('added intf %s (%d) to node %s\n' % (intf, port, self.name))
+        # debug('\n'=)
+        # debug('added intf %s (%d) to node %s\n' % (intf, port, self.name))
 
     def connectionsTo(self, node):
         "Return [ intf1, intf2... ] for all intfs that connect self to node."
@@ -462,6 +462,386 @@ class Node_wifi(Node):
             self.cmd('ip link set %s up' % intf.name)
         self.showNode()
 
+
+class OpportunisticNetworkNode(Node_wifi):
+    "An Opportunistic Network Node"
+    def __init__(self, name, inNamespace=True, **params):
+        Node_wifi.__init__( self, name, **params )
+        self.packet_queue = Queue(maxsize=10)  # queue of not yet transferred packets
+        self.UDP_PORT = 5005
+
+    def enqueue(self, station, packet):
+        """ Add a packet to the queue with expiration time and ID """
+        if self.packet_queue.full():
+            print("{}: Queue is full, dropping the oldest packet".format(station.name))
+            self.packet_queue.get()  # Drop the oldest packet
+            return False
+        if packet['destination'] == None:
+            return False
+
+        print("{}: enqueuing packet {} with start time {} expiration time {} hop count {} and destination {}".format(station.name, packet['packet_id'], packet['start_time'], packet['expire_time'], packet['hopCount'], packet['destination']))
+        self.packet_queue.put({
+            'packet_id': packet['packet_id'],
+            'start_time': packet['start_time'],
+            'expire_time': packet['expire_time'],
+            'hopCount': packet['hopCount'],
+            'hops': packet['hops'],  
+            'source': packet['source'],
+            'destination': packet['destination'],
+            'content': packet['content']
+        })
+        return True
+
+    def dequeue(self):
+        """ Remove and return the first packet in the queue """
+        if not self.packet_queue.empty():
+            return self.packet_queue.get()
+        return None  # Queue is empty
+
+    def find(self, packet_id):
+        """ Find a packet by packet_id in the queue """
+        for packet_entry in list(self.packet_queue.queue):
+            if packet_entry['packet_id'] == packet_id:
+                return packet_entry
+        return None  # Packet not found
+
+    def drop(self, station, packet_id):
+        """ Drop a specific packet by packet_id from the queue """
+        temp_queue = Queue(self.packet_queue.maxsize)
+        dropped = False
+        while not self.packet_queue.empty():
+            packet_entry = self.packet_queue.get()
+            if packet_entry['packet_id'] == packet_id:
+                dropped = True
+            else:
+                temp_queue.put(packet_entry)
+        self.packet_queue = temp_queue
+        print("{}: Dropped {} from queue".format(station.name, packet_id))
+
+    def dropExpiredPackets(self, current_time):
+        """ Drop all expired packets from the queue """
+        temp_queue = Queue(self.max_len)
+        while not self.packet_queue.empty():
+            packet_entry = self.packet_queue.get()
+            if packet_entry['expire_time'] > current_time:
+                temp_queue.put(packet_entry)  # Keep non-expired packets
+        self.packet_queue = temp_queue
+
+    def findDisjointPackets(self, received_summary_vector):
+        """ Find packets in the queue that are not in the received summary vector """
+        disjoint_packets = []
+        current_summary_vector = [packet_entry['packet_id'] for packet_entry in list(self.packet_queue.queue)]
+        for packet_id in current_summary_vector:
+            if packet_id not in received_summary_vector:
+                disjoint_packets.append(packet_id)
+        return disjoint_packets
+
+    def getExpireTime(self, packet_id):
+        """ Get the expiration time of a specific packet """
+        packet = self.find(packet_id)
+        return packet['expire_time'] if packet else None
+
+    def setPacketID(self, packet, packet_id):
+        """ Set packet_id for a specific packet """
+        packet_entry = self.find(packet_id)
+        if packet_entry:
+            packet_entry['packet_id'] = packet_id
+
+    def getPacketID(self, packet):
+        """ Get the packet_id for a specific packet """
+        packet_entry = self.find(packet['packet_id'])
+        return packet_entry['packet_id'] if packet_entry else None
+
+    def sendSummaryVector(self, neighbors):
+        # sleep(10)
+        """ Send a summary vector (packet IDs) to a neighbor node """
+        for neighbor in neighbors:
+            if neighbor.IP() == None: 
+                break
+
+            summary_vector = [
+                {
+                    'packet_id': packet_entry['packet_id'],
+                    'start_time': packet_entry['start_time'],
+                    'expire_time': packet_entry['expire_time'],
+                    'hopCount': packet_entry['hopCount'],
+                    'hops': packet_entry['hops'],  
+                    'source': packet_entry['source'],
+                    'destination': packet_entry['destination'],
+                    'content': packet_entry['content']
+                }
+                for packet_entry in list(self.packet_queue.queue)
+            ]
+
+            summary_vector_str = json.dumps(summary_vector)
+            packet_ids = [packet['packet_id'] for packet in summary_vector]
+
+            # Simulate sending the summary vector to a neighbor
+            print("{}: sending summary vector with packet IDs {} to node {}".format(self.name, packet_ids, neighbor.name))
+            cmd = 'echo "{}" | timeout 5s nc -u {} {}'.format(summary_vector_str.replace('"', '\\"'), neighbor.IP(), self.UDP_PORT)
+            result = self.pexec(cmd, shell=True)
+
+    def listenForSummaryVectors(self, station):
+        """Receive and process a summary vector from a neighbor node."""
+        signal_file_path = "{}.signal".format(station.name)
+
+        while True:
+            # Wait until the signal file is created by the simulator
+            while not os.path.exists(signal_file_path):
+                sleep(1)
+
+            try:
+                # Read the content of the JSON file
+                with open("{}.txt".format(station.name), 'r') as file:
+                    received_data = file.read()
+
+                if received_data:
+                    # Print the received message
+                    last_received_data = received_data.strip().split('\n')[-1]
+                    print("{}: receiving message: {}".format(station.name, last_received_data.strip()))
+
+                    # Remove any extra newlines or spaces and load JSON string into a Python object
+                    summary_vector = json.loads(last_received_data.strip())
+                    # Iterate over the packets in the summary vector
+                    for packet in summary_vector:
+                        packet_id = packet['packet_id']
+                        start_time = packet['start_time']
+                        expire_time = packet['expire_time']
+                        hopCount = packet['hopCount']
+                        hops = packet['hops']
+                        source = packet['source']
+                        destination = packet['destination']
+                        content = packet['content']
+
+                        if destination == station.name:
+                            print("{}: Packet {} reaches destination: {}".format(station.name, packet_id, destination))
+
+                            # Write result to result.json
+                            self.write_result_to_json(station, packet)
+
+                            # Drop the packet from the queue
+                            self.drop(station, packet_id)
+                        elif self.is_packet_in_queue(packet_id):
+                            print("{}: Packet with packet_id '{}' is already in the queue".format(station.name, packet_id))
+                        else:
+                            print("{}: Packet with packet_id '{}' is not in the queue. Adding packet_id '{}' to the queue".format(station.name, packet_id, packet_id))
+                            packet = {
+                                'source': source,
+                                'destination': destination,  # Set destination to the neighbor's IP
+                                'packet_id': packet_id,
+                                'start_time': start_time,
+                                'expire_time': expire_time,
+                                'hopCount': hopCount+1,
+                                'hops': hops + [station.name],
+                                'content': content,
+                            }
+                            self.enqueue(station, packet)
+            except Exception as e:
+                print("Error: {}".format(e))
+
+            # Remove the signal file to indicate the content has been read
+            os.remove(signal_file_path)
+
+    def write_result_to_json(self, station, packet):
+        result_file = "result.json"
+
+        # Calculate end-to-end delay
+        end_to_end_delay = int((time() - packet['start_time']) * 1000)  # convert to ms
+
+        # Create the new packet entry
+        new_entry = {
+            "packet_id": packet['packet_id'],
+            "end_to_end_delay": end_to_end_delay,  # in milliseconds
+            "hopCount": packet['hopCount'],
+            "hops": packet['hops']
+        }
+
+        # Check if the result file exists, if not create one
+        if os.path.exists(result_file):
+            with open(result_file, 'r') as file:
+                data = json.load(file)  # Load the existing data
+        else:
+            data = {"packets": []}  # Initialize with an empty list if file doesn't exist
+
+        # Append the new entry
+        data['packets'].append(new_entry)
+
+        # Write the updated data back to the result.json file
+        with open(result_file, 'w') as file:
+            json.dump(data, file, indent=4)  # Indent for better formatting
+
+        print("{}: Packet {} result written to result.json".format(station.name, packet['packet_id']))
+
+    def is_packet_in_queue(self, packet_id_to_check):
+        """
+        Check if a packet with a specific packet_id exists in the queue.
+        :param queue: List of packet dictionaries.
+        :param packet_id_to_check: The packet_id to look for in the queue.
+        :return: True if the packet is found, False otherwise.
+        """
+        while not self.packet_queue.empty():
+            packet = self.packet_queue.get()
+            if packet['packet_id'] == packet_id_to_check:
+                return True
+        return False
+
+
+class OpportunisticNetworkNodeWithRlAlgo(OpportunisticNetworkNode):
+    "An Opportunistic Network Node with Reinforcement Learning Algorithm Q-learning"
+    def __init__(self, name, epsilon=0.1, learning_rate=0.5, discount_factor=0.9, **params):
+        OpportunisticNetworkNode.__init__( self, name, **params )
+        self.name = name
+        self.epsilon = epsilon  # Exploration rate
+        self.learning_rate = learning_rate  # Learning rate for Q-value update
+        self.discount_factor = discount_factor  # Future reward discount
+        self.q_table = {}  # To store Q-values
+    
+    def choose_neighbor(self, packet_ids, neighbors):
+        # Convert packet_ids list to tuple so it can be used as a key in q_table
+        packet_ids_tuple = tuple(packet_ids)
+
+        # Exploration vs Exploitation using epsilon-greedy
+        if random.uniform(0, 1) < self.epsilon:
+            # Exploration: choose a random neighbor
+            chosen_neighbor = random.choice(neighbors)
+        else:
+            # Exploitation: choose the neighbor with the highest Q-value
+            state = (self.name, packet_ids_tuple)  # Current state (node, packet_ids as tuple)
+            if state in self.q_table:
+                chosen_neighbor = max(self.q_table[state], key=self.q_table[state].get)
+            else:
+                # If no Q-values exist for this state, explore randomly
+                chosen_neighbor = random.choice(neighbors)
+        
+        print("{}: Chose neighbor {} for forwarding packet {}".format(self.name, chosen_neighbor.name, packet_ids))
+        return chosen_neighbor
+
+    def update_q_value(self, packet_ids, chosen_neighbor, neighbors, reward):
+        # Convert packet_ids to tuple to make it hashable (usable as a key)
+        packet_ids_tuple = tuple(packet_ids)
+        
+        state = (self.name, packet_ids_tuple)
+        next_state = (chosen_neighbor.name, packet_ids_tuple)
+        
+        # Initialize Q-values for the current state if not already present
+        if state not in self.q_table:
+            self.q_table[state] = {neighbor.name: 0 for neighbor in neighbors}
+        
+        # Find the maximum future Q-value for the next state
+        max_future_q = max(self.q_table[next_state].values()) if next_state in self.q_table else 0
+        current_q = self.q_table[state][chosen_neighbor.name]
+        
+        # Q-value update rule
+        new_q = current_q + self.learning_rate * (reward + self.discount_factor * max_future_q - current_q)
+        self.q_table[state][chosen_neighbor.name] = new_q
+    
+        print("{}: Updated Q-value for neighbor {} on packet {} to {}".format(self.name, chosen_neighbor.name, packet_ids, new_q))
+        
+    def get_reward(self, packet_ids, chosen_neighbor):
+        """
+        Reward function that checks if the packet is found in the chosen neighbor's .txt file.
+        If the packet is found, return reward 1, otherwise return 0.
+        """
+        file_path = "{}.txt".format(chosen_neighbor.name)
+        signal_file_path = "{}.signal".format(chosen_neighbor.name)
+
+        # Check if the file exists
+        if os.path.exists(file_path):
+            # Wait until the signal file is created by the simulator
+            while os.path.exists(signal_file_path):
+                sleep(1)
+            try:
+                # Open and read the neighbor's file to search for the packet ID
+                with open(file_path, 'r') as file:
+                    content = file.read()
+
+                    if content:
+                        # Check if all packet IDs are found in the file content
+                        all_found = all(str(packet_id) in content for packet_id in packet_ids)
+                        
+                        if all_found:
+                            print("{}: All packets {} found in {}'s file. Reward: 1".format(self.name, packet_ids, chosen_neighbor.name))
+                            return 1  # Return reward 1 if all packet IDs are found
+                        else:
+                            print("{}: Not all packets {} found in {}'s file. Reward: 0".format(self.name, packet_ids, chosen_neighbor.name))
+                            return 0  # Return reward 0 if any packet ID is missing
+                    else:
+                        print("{}: File {} is empty. Reward: 0".format(self.name, file_path))
+                        return 0
+            except Exception as e:
+                print("Error reading {}'s file: {}".format(chosen_neighbor.name, e))
+                return 0  # In case of an error, return reward 0
+
+        else:
+            print("{} does not exist for {}. Reward: 0".format(file_path, chosen_neighbor.name))
+            return 0  # Return reward 0 if file does not exist
+
+    def sendSummaryVector(self, neighbors):
+        sleep(10)
+        """ Send a summary vector (packet IDs) to a neighbor node """
+        summary_vector = [
+            {
+                'packet_id': packet_entry['packet_id'],
+                'start_time': packet_entry['start_time'],
+                'expire_time': packet_entry['expire_time'],
+                'hopCount': packet_entry['hopCount'],
+                'hops': packet_entry['hops'],  
+                'source': packet_entry['source'],
+                'destination': packet_entry['destination'],
+                'content': packet_entry['content']
+            }
+            for packet_entry in list(self.packet_queue.queue)
+        ]
+
+        summary_vector_str = json.dumps(summary_vector)
+        packet_ids = [packet['packet_id'] for packet in summary_vector]
+
+        # Choose a neighbor using epsilon-greedy
+        chosen_neighbor = self.choose_neighbor(packet_ids, neighbors)
+
+        if chosen_neighbor.IP() == None: 
+            return
+
+        # Simulate sending the summary vector to a neighbor
+        print("{}: sending summary vector with packet IDs {} to node {}".format(self.name, packet_ids, chosen_neighbor.name))
+        cmd = 'echo "{}" | timeout 5s nc -u {} {}'.format(summary_vector_str.replace('"', '\\"'), chosen_neighbor.IP(), self.UDP_PORT)
+        result = self.pexec(cmd, shell=True)
+        
+        # After forwarding, get a reward (e.g., successful delivery, packet hop efficiency)
+        reward = self.get_reward(packet_ids, chosen_neighbor)
+        
+        # Update Q-values based on the reward received
+        self.update_q_value(packet_ids, chosen_neighbor, neighbors, reward)
+
+    def write_result_to_json(self, station, packet):
+        result_file = "result_rlAlgo.json"
+
+        # Calculate end-to-end delay
+        end_to_end_delay = int((time() - packet['start_time']) * 1000)  # convert to ms
+
+        # Create the new packet entry
+        new_entry = {
+            "packet_id": packet['packet_id'],
+            "end_to_end_delay": end_to_end_delay,  # in milliseconds
+            "hopCount": packet['hopCount'],
+            "hops": packet['hops']
+        }
+
+        # Check if the result file exists, if not create one
+        if os.path.exists(result_file):
+            with open(result_file, 'r') as file:
+                data = json.load(file)  # Load the existing data
+        else:
+            data = {"packets": []}  # Initialize with an empty list if file doesn't exist
+
+        # Append the new entry
+        data['packets'].append(new_entry)
+
+        # Write the updated data back to the result.json file
+        with open(result_file, 'w') as file:
+            json.dump(data, file, indent=4)  # Indent for better formatting
+
+        print("{}: Packet {} result written to result_rlAlgo.json".format(station.name, packet['packet_id']))
 
 class Station(Node_wifi):
     "A station is simply a Node"

@@ -1,1 +1,0 @@
-sp.record(distances = {}, latest_infor = {}, timestamps = {})

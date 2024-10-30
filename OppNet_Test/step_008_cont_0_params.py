@@ -1,1 +1,0 @@
-sp.record(distance = '64.47 meters', staX = 'sta1', staY = 'sta2')

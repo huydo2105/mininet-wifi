@@ -1,1 +1,0 @@
-sp.record(network_info = {'channel' : '1', 'freq' : '2.4', 'ip' : '10.0.0.2/8', 'mac' : '00:00:00:00:00:02', 'mode' : 'g', 'position' : '24.67, 68.67, 0.0'}, station_name = 'sta1', timestamp = '2024-02-22 17:46:06')

@@ -1829,6 +1829,94 @@ class adhoc(LinkAttrs):
         sh('echo \'{}\' > {}'.format(cmd, pattern))
         self.cmd(self.get_wpa_cmd())
 
+class epidemic(LinkAttrs):
+    node = None
+
+    def __init__(self, node, intf, mn_wifi, proto_args='', **params):
+        """Configure Epidemic
+        node: name of the node
+        self: custom association class/constructor
+        params: parameters for station"""
+        intf = node.getNameToWintf(intf)
+        wlan = node.params['wlan'].index(intf.name)
+
+        if isinstance(intf, master): intf.kill_hostapd_process()
+
+        LinkAttrs.__init__(self, node, intf, wlan)
+        self.associatedTo = 'adhoc'
+
+        # It takes default values if keys are not set
+        kwargs = {'ibss': '02:CA:FF:EE:BA:01', 'ht_cap': '',
+                  'passwd': None, 'ssid': 'adhocNet', 'proto': None,
+                  'mode': 'g', 'channel': 1, 'txpower': 15,
+                  'ap_scan': 2, 'bitrates': ''}
+
+        for k, v in kwargs.items():
+            setattr(self, k, params.get(k, v))
+
+        self.check_channel_band(self.ht_cap)
+
+        if intf and hasattr(intf, 'wmIface'):
+            self.wmIface = intf.wmIface
+
+        if 'mp' in intf.name:
+            self.iwdev_cmd('{} del'.format(intf.name))
+            node.params['wlan'][wlan] = intf.name.replace('mp', 'wlan')
+
+        self.name = intf.name
+
+        intf1 = WirelessLink(name=node.params['wlan'][wlan], node=node,
+                             link=self, port=wlan)
+        intf2 = 'wifiAdhoc'
+
+        node.addWAttr(self, port=wlan)
+
+        self.freq = Getfreq(self.mode, self.channel).freq
+        self.setReg()
+        self.configureAdhoc()
+
+        self.setTxPower(self.txpower)
+
+        if self.proto: 
+            self.manetProtocol = manetProtocols(self, proto_args, node=node, mn_wifi=mn_wifi)
+
+        # All we are is dust in the wind, and our two interfaces
+        self.intf1, self.intf2 = intf1, intf2
+
+    def configureAdhoc(self):
+        "Configure Wireless Ad Hoc"
+        self.set_dev_type('ibss')
+        self.ipLink('up')
+
+        if self.passwd:
+            self.setSecuredAdhoc()
+        else:
+            if self.bitrates:
+                self.set_bitrates(self.bitrates)
+            self.join_ibss(self.ssid, self.format_freq(),
+                           self.ht_cap, self.ibss)
+
+    def get_sta_confname(self):
+        return '{}_0.staconf'.format(self.name)
+
+    def setSecuredAdhoc(self):
+        "Set secured adhoc"
+        cmd = 'ctrl_interface=/var/run/wpa_supplicant\n'
+        cmd += 'ap_scan={}\n'.format(self.ap_scan)
+        cmd += 'network={\n'
+        cmd += '         ssid="{}"\n'.format(self.ssid)
+        cmd += '         mode=1\n'
+        cmd += '         frequency={}\n'.format(self.format_freq())
+        cmd += '         proto=RSN\n'
+        cmd += '         key_mgmt=WPA-PSK\n'
+        cmd += '         pairwise=CCMP\n'
+        cmd += '         group=CCMP\n'
+        cmd += '         psk="{}"\n'.format(self.passwd)
+        cmd += '}'
+
+        pattern = self.get_sta_confname()
+        sh('echo \'{}\' > {}'.format(cmd, pattern))
+        self.cmd(self.get_wpa_cmd())
 
 class mesh(LinkAttrs):
     node = None

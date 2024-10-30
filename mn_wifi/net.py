@@ -27,11 +27,11 @@ from mn_wifi.energy import Energy
 from mn_wifi.link import IntfWireless, wmediumd, _4address, HostapdConfig, \
     WirelessLink, TCWirelessLink, ITSLink, WifiDirectLink, adhoc, mesh, \
     master, managed, physicalMesh, PhysicalWifiDirectLink, _4addrClient, \
-    _4addrAP, phyAP
+    _4addrAP, phyAP, epidemic
 from mn_wifi.mobility import Tracked as TrackedMob, model as MobModel, \
     Mobility as mob, ConfigMobility, ConfigMobLinks
 from mn_wifi.module import Mac80211Hwsim
-from mn_wifi.node import AP, Station, Car, OVSKernelAP, physicalAP
+from mn_wifi.node import AP, Station, Car, OVSKernelAP, physicalAP, OpportunisticNetworkNode, OpportunisticNetworkNodeWithRlAlgo
 from mn_wifi.plot import Plot2D, Plot3D, PlotGraph
 from mn_wifi.propagationModels import PropagationModel as ppm
 from mn_wifi.sixLoWPAN.link import LowPANLink, LoWPAN
@@ -169,7 +169,7 @@ class Mininet_wifi(Mininet, Mininet_IoT, Mininet_WWAN):
         self.epoch = []
         self.velocity = ()
         self.initial_mediums = []
-        self.retry_queue = []
+        self.packet_id = 1
 
         if autoSetPositions and link == wmediumd:
             self.wmediumd_mode = interference
@@ -369,6 +369,52 @@ class Mininet_wifi(Mininet, Mininet_IoT, Mininet_WWAN):
         if Mac80211Hwsim.hwsim_ids:
             Mac80211Hwsim(node=node, on_the_fly=True)
             self.config_runtime_node(node)
+
+    def addOpportunisticNetworkNode(self, name, rlAlgo=False, **params):
+        """Add Opportunistic Network node.
+           name: name of station to add
+           params: parameters for station
+           returns: added station"""
+        # Default IP and MAC addresses
+        defaults = {'ip': ipAdd(self.nextIP,
+                                ipBaseNum=self.ipBaseNum,
+                                prefixLen=self.prefixLen) +
+                          '/{}'.format(self.prefixLen),
+                    'ip6': ipAdd6(self.nextIP6,
+                                  ipBaseNum=self.ip6BaseNum,
+                                  prefixLen=self.prefixLen6) +
+                          '/{}'.format(self.prefixLen6),
+                    'channel': self.channel,
+                    'band': self.band,
+                    'freq': self.freq,
+                    'mode': self.mode,
+                    'encrypt': self.encrypt,
+                    'passwd': self.passwd,
+                    'ieee80211w': self.ieee80211w
+                   }
+        defaults.update(params)
+
+        if self.autoSetPositions and 'position' not in params:
+            defaults['position'] = [round(self.nextPos_sta, 2), 0, 0]
+        if self.autoSetMacs:
+            defaults['mac'] = macColonHex(self.nextIP)
+        if self.autoPinCpus:
+            defaults['cores'] = self.nextCore
+            self.nextCore = (self.nextCore + 1) % self.numCores
+        self.nextIP += 1
+        self.nextIP6 += 1
+        self.nextPos_sta += 2
+
+        cls = rlAlgo and OpportunisticNetworkNodeWithRlAlgo or OpportunisticNetworkNode
+        sta = cls(name, **defaults)
+
+        if 'position' in params or self.autoSetPositions:
+            self.pos_to_array(sta)
+
+        self.addWlans(sta)
+        self.stations.append(sta)
+        self.nameToNode[name] = sta
+        return sta
 
     def addStation(self, name, cls=None, **params):
         """Add Station.
@@ -626,7 +672,7 @@ class Mininet_wifi(Mininet, Mininet_IoT, Mininet_WWAN):
             intf.associate(ap_intf)
 
     def addLink(self, node1, node2=None, port1=None, port2=None,
-                cls=None, **params):
+                cls=None, mn_wifi=None, **params):
         """"Add a link from node1 to node2
             node1: source node (or name)
             node2: dest node (or name)
@@ -647,6 +693,10 @@ class Mininet_wifi(Mininet, Mininet_IoT, Mininet_WWAN):
             self.links.append(link)
             if node2 and self.wmediumd_mode == error_prob:
                 self.infra_wmediumd_link(node1, node2, **params)
+            return link
+        elif cls == epidemic:
+            link = cls(node=node1, mn_wifi=mn_wifi, **params)
+            self.links.append(link)
             return link
         elif cls == physicalMesh:
             cls(node=node1, **params)

@@ -1,12 +1,34 @@
 from mn_wifi.net import Mininet_wifi
 from mn_wifi.cli import CLI
-from mn_wifi.link import wmediumd, adhoc
+from mn_wifi.link import wmediumd, adhoc, epidemic
 from mn_wifi.wmediumdConnector import interference
 from mininet.log import setLogLevel, info
 from mininet.node import RemoteController
-import threading
+from threading import Thread
 import random
 import time
+import subprocess
+
+xterm_pids = []
+
+def listen_for_beacons(station):
+    """
+    Each station listens for incoming beacons and processes them.
+    """
+    print("Station {} is listening for beacons.".format(station.name))
+    scapy_script = '/home/huydq/Mininet/mininet-wifi/oppNet/main/sta.py'
+    process = station.cmd('xterm -hold -e "python {} --name {} --ip {}" &'.format(scapy_script, station.name, station.IP()))
+    # Get the PID of the last background process (xterm)
+    pid = station.cmd("echo $!")
+    xterm_pids.append(pid.strip())
+
+def stop_protocol():
+    for pid in xterm_pids:
+        try:
+            subprocess.call(["kill", "-9", pid])
+            print("Killed xterm with PID: {}".format(pid))
+        except Exception as e:
+            print("Failed to kill xterm with PID: {}. Error: {}".format(pid,e))
 
 def allocate_channels(stations, current_allocation):
     """Dynamically allocate channels to stations based on interference."""
@@ -52,11 +74,6 @@ def monitor_and_allocate_channels(stations, net):
                     info("Error setting channel for {}: {}\n".format(sta, e))
         time.sleep(60) 
 
-def delayed_start(stations, net, delay):
-    """Delay the start of the monitor_and_allocate_channels function."""
-    time.sleep(delay)
-    monitor_and_allocate_channels(stations, net)
-
 def setup_network(num_stations):
     net = Mininet_wifi(link=wmediumd, wmediumd_mode=interference)
     c0 = net.addController('c0')
@@ -70,21 +87,29 @@ def setup_network(num_stations):
     for i in range(num_stations):
         x_pos = random.uniform(0, 100)  # Random X position between 0 and 100
         y_pos = random.uniform(0, 100)  # Random Y position between 0 and 100
-        stations.append(net.addStation('sta{}'.format(i+1), ip6='fe80::{}'.format(i+1), 
-                                        position='{}, {}, 0'.format(x_pos, y_pos),
-                                        **kwargs))
+        stations.append(net.addOpportunisticNetworkNode('sta{}'.format(i+1), ip6='fe80::{}'.format(i+1), 
+                                        position='{}, {}, 0'.format(x_pos, y_pos), rlAlgo=False, **kwargs))
 
     net.setPropagationModel(model="logDistance", exp=4)
 
+    net.setMobilityModel(time=0, model='RandomDirection',
+                         max_x=100, max_y=100, seed=20)
 
     info("*** Configuring wifi nodes\n")
     net.configureWifiNodes()
 
     # net.setMobilityModel(time=0, model='RandomDirection', max_x=250, max_y=250, seed=20)
 
+    info("*** Starting listening for beacon packets for each station\n")
+    for sta in stations:
+        listen_for_beacons(sta)
+
     info("*** Creating ad-hoc links\n")
     for sta in stations:
-        net.addLink(sta, cls=adhoc, intf='{}-wlan0'.format(sta.name), ssid='adhocNet', mode='g', channel=5, ht_cap='HT40+')
+        net.addLink(sta, cls=epidemic, mn_wifi=net, intf='{}-wlan0'.format(sta.name), ssid='adhocNet', mode='g', channel=5, ht_cap='HT40+',
+                        proto='epidemic')
+
+        
 
     # info("*** Setting Station TX Power\n")
     # for sta in stations:
@@ -97,11 +122,5 @@ def setup_network(num_stations):
     info("\n*** Addressing...\n")
     for i in range(num_stations):
         stations[i].setIP6('2001::{}/64'.format(i+1), intf="sta{}-wlan0".format(i+1))
-
-    # info("*** Starting the dynamic channel allocation thread with a delay to wait for stations's initializtion\n")
-    # delay = 15  # Delay in seconds
-    # channel_thread = threading.Thread(target=delayed_start, args=(stations, net, delay))
-    # channel_thread.daemon = True
-    # channel_thread.start()
 
     return net, stations

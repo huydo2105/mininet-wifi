@@ -1,0 +1,172 @@
+{
+    "packets": [
+        {
+            "hops": [
+                "sta28",
+                "sta21",
+                "sta20",
+                "sta16"
+            ],
+            "packet_id": "sta4-sta3-0",
+            "hopCount": 4,
+            "end_to_end_delay": 20654
+        },
+        {
+            "hops": [
+                "sta7",
+                "sta22",
+                "sta16",
+                "sta26"
+            ],
+            "packet_id": "sta3-sta4-0",
+            "hopCount": 4,
+            "end_to_end_delay": 18095
+        },
+        {
+            "hops": [
+                "sta19",
+                "sta10",
+                "sta15",
+                "sta27"
+            ],
+            "packet_id": "sta3-sta4-3",
+            "hopCount": 4,
+            "end_to_end_delay": 19361
+        },
+        {
+            "hops": [
+                "sta25",
+                "sta13",
+                "sta30",
+                "sta7",
+                "sta24"
+            ],
+            "packet_id": "sta3-sta4-2",
+            "hopCount": 5,
+            "end_to_end_delay": 49724
+        },
+        {
+            "hops": [
+                "sta2",
+                "sta30",
+                "sta18",
+                "sta24"
+            ],
+            "packet_id": "sta3-sta4-0",
+            "hopCount": 4,
+            "end_to_end_delay": 47633
+        },
+        {
+            "hops": [
+                "sta24",
+                "sta27",
+                "sta1",
+                "sta27"
+            ],
+            "packet_id": "sta4-sta3-0",
+            "hopCount": 4,
+            "end_to_end_delay": 35155
+        },
+        {
+            "hops": [
+                "sta25",
+                "sta29",
+                "sta4",
+                "sta3"
+            ],
+            "packet_id": "sta2-sta4-3",
+            "hopCount": 4,
+            "end_to_end_delay": 19323
+        },
+        {
+            "hops": [
+                "sta18",
+                "sta10",
+                "sta21",
+                "sta27",
+                "sta24"
+            ],
+            "packet_id": "sta3-sta4-1",
+            "hopCount": 5,
+            "end_to_end_delay": 40090
+        },
+        {
+            "hops": [
+                "sta23",
+                "sta13",
+                "sta27",
+                "sta10"
+            ],
+            "packet_id": "sta1-sta4-3",
+            "hopCount": 4,
+            "end_to_end_delay": 19399
+        },
+        {
+            "hops": [
+                "sta8",
+                "sta21",
+                "sta24",
+                "sta6"
+            ],
+            "packet_id": "sta4-sta3-1",
+            "hopCount": 4,
+            "end_to_end_delay": 9705
+        },
+        {
+            "hops": [
+                "sta6",
+                "sta12",
+                "sta16",
+                "sta18",
+                "sta27"
+            ],
+            "packet_id": "sta3-sta4-1",
+            "hopCount": 5,
+            "end_to_end_delay": 17343
+        },
+        {
+            "hops": [
+                "sta10",
+                "sta17",
+                "sta10",
+                "sta6"
+            ],
+            "packet_id": "sta1-sta4-3",
+            "hopCount": 4,
+            "end_to_end_delay": 17172
+        },
+        {
+            "hops": [
+                "sta22",
+                "sta1",
+                "sta11",
+                "sta4"
+            ],
+            "packet_id": "sta1-sta4-4",
+            "hopCount": 4,
+            "end_to_end_delay": 11462
+        },
+        {
+            "hops": [
+                "sta13",
+                "sta10",
+                "sta12",
+                "sta30"
+            ],
+            "packet_id": "sta3-sta4-3",
+            "hopCount": 4,
+            "end_to_end_delay": 15226
+        },
+        {
+            "hops": [
+                "sta7",
+                "sta23",
+                "sta4",
+                "sta10"
+            ],
+            "packet_id": "sta4-sta3-1",
+            "hopCount": 4,
+            "end_to_end_delay": 11601
+        }
+    ]
+}
